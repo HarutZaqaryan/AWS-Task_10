@@ -5,9 +5,15 @@ const cognito = new AWS.CognitoIdentityServiceProvider();
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 export const handler = async (event) => {
+  console.log("~~~Event~~~", event);
   const path = event.rawPath;
+  console.log("~~~Event path~~~", path);
   const method = event.requestContext.http.method;
+  console.log("~~~Event method~~~", method);
   const headers = event.headers;
+  console.log("~~~Event headers~~~", event);
+  console.log("~~~Event body~~~", event.body);
+  console.log("~~~Event body(parsed)~~~", JSON.parse(event.body));
 
   try {
     if (path === "/signup" && method === "POST") {
@@ -43,6 +49,7 @@ export const handler = async (event) => {
         ],
         MessageAction: "SUPRESS",
       };
+      console.log("~~~params(post/signup)~~~", params);
 
       await cognito.adminCreateUser(params).promise();
 
@@ -79,6 +86,7 @@ export const handler = async (event) => {
           PASSWORD: password,
         },
       };
+      console.log("~~~params(get/signin)~~~", params);
 
       try {
         const authResponse = await cognito.initiateAuth(params).promise();
@@ -89,11 +97,14 @@ export const handler = async (event) => {
           }),
         };
       } catch (error) {
-        if (error.code === 'NotAuthorizedException' || error.code === 'UserNotFoundException') {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Invalid username or password' })
-            };
+        if (
+          error.code === "NotAuthorizedException" ||
+          error.code === "UserNotFoundException"
+        ) {
+          return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Invalid username or password" }),
+          };
         }
         throw error;
       }
@@ -142,6 +153,7 @@ export const handler = async (event) => {
           minOrder,
         },
       };
+      console.log("~~~params(post/tables)~~~", params);
 
       await dynamodb.put(params).promise();
 
@@ -168,6 +180,7 @@ export const handler = async (event) => {
           id: tableId,
         },
       };
+      console.log("~~~params(post/startswithTable)~~~", params);
 
       const result = await dynamodb.get(params).promise();
 
@@ -217,6 +230,7 @@ export const handler = async (event) => {
           slotTimeEnd,
         },
       };
+      console.log("~~~params(post/reservations)~~~", params);
 
       await dynamodb.put(params).promise();
 
