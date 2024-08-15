@@ -173,16 +173,17 @@ const signinHandler = async (event) => {
     console.log("We are in try block(signinHandler)");
 
     const response = await cognito.initiateAuth(params).promise();
-    const idToken = response.AuthenticationResult.IdToken;
-    return idToken;
-    // return {
-    //   statusCode: 200,
-    //   body: JSON.stringify({
-    //     accessToken: response.AuthenticationResult.IdToken,
-    //   }),
-    // };
+    // const idToken = response.AuthenticationResult.IdToken;
+    // return idToken;
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        // accessToken: response.AuthenticationResult.IdToken,
+        token: response.AuthenticationResult.IdToken,
+      }),
+    };
   } catch (error) {
-    console.log("We are in try block(signinHandler)");
+    console.log("We are in catch block(signinHandler)",error.message);
 
     return {
       statusCode: 400,
@@ -207,6 +208,8 @@ const getTablesHandler = async (event) => {
       body: JSON.stringify({ tables: data.Items }),
     };
   } catch (error) {
+    console.log("getTablesHandler catch block",errpr.message);
+    
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
