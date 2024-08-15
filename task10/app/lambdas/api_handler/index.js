@@ -165,7 +165,6 @@ const signinHandler = async (event) => {
     // AuthFlow: "USER_PASSWORD_AUTH",
     AuthFlow: "ADMIN_NO_SRP_AUTH",
     // ClientId: clientId,
-    UserPoolId:userPoolID,
     ClientId: userClientID,
     AuthParameters: {
       USERNAME: eventObj.email,
@@ -184,7 +183,7 @@ const signinHandler = async (event) => {
 
     // const idToken = response.AuthenticationResult.IdToken;
     // return idToken;
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({
