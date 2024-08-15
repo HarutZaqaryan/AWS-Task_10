@@ -187,7 +187,8 @@ const signinHandler = async (event) => {
     return {
       statusCode: 200,
       body: JSON.stringify({
-        accessToken: response.AuthenticationResult.IdToken,
+        // accessToken: response.AuthenticationResult.IdToken,
+        accessToken: response.Session,
       }),
     };
   } catch (error) {
