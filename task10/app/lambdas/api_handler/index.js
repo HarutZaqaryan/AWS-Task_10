@@ -173,6 +173,7 @@ const signinHandler = async (event) => {
     console.log("We are in try block(signinHandler)");
 
     const response = await cognito.initiateAuth(params).promise();
+    console.log("~~~response from signinhandler",response);
     // const idToken = response.AuthenticationResult.IdToken;
     // return idToken;
     return {
