@@ -8,7 +8,8 @@ const T_tables = process.env.tables_table || "Tables000";
 console.log("~~~T_tables~~~~", T_tables);
 const T_reservations = process.env.reservations_table || "Reservations000";
 console.log("~~~T_reservations~~~~", T_reservations);
-const userPoolName = process.env.booking_userpool || "simple-booking-userpool000";
+const userPoolName =
+  process.env.booking_userpool || "simple-booking-userpool000";
 console.log("~~~user_pool_id~~~~", userPoolName);
 let userPoolID;
 let userClientID;
@@ -63,12 +64,12 @@ const getuserPoolNameByName = async (userPoolName) => {
       MaxResults: 60,
     };
     const response = await cognito.listUserPools(params).promise();
-    console.log("~~~Response from getuserPoolNamebyName",response);
+    console.log("~~~Response from getuserPoolNamebyName", response);
 
     const userPool = response.UserPools.find(
       (pool) => pool.Name === userPoolName
     );
- 
+
     if (userPool) {
       return userPool.Id;
     } else {
@@ -84,7 +85,7 @@ const getClientId = async () => {
   try {
     const params = {
       UserPoolId: userPoolID,
-      MaxResults: 60 // Adjust this if you expect more clients
+      MaxResults: 60, // Adjust this if you expect more clients
     };
 
     const response = await cognito.listUserPoolClients(params).promise();
@@ -140,7 +141,7 @@ const signupHandler = async (event) => {
       body: JSON.stringify({ message: "Sign-up process is successful" }),
     };
   } catch (error) {
-    console.log("We are in catch block(signupHandler)",error.message);
+    console.log("We are in catch block(signupHandler)", error.message);
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -177,22 +178,52 @@ const signinHandler = async (event) => {
     console.log("We are in try block(signinHandler)");
 
     const response = await cognito.initiateAuth(params).promise();
-    console.log("~~~response from signinhandler",response);
+    console.log("~~~response from signinhandler", response);
     // const response = await cognito.adminInitiateAuth(params).promise();
     // console.log("~~~response from signinhandler",response);
 
     // const idToken = response.AuthenticationResult.IdToken;
     // return idToken;
+    if (response.ChallengeName === "NEW_PASSWORD_REQUIRED") {
+      // Handle the new password required challenge
+      const newPassword = eventObj.password; // Get the new password from the event or another source
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        // accessToken: response.AuthenticationResult.IdToken,
-        accessToken: response.Session,
-      }),
-    };
+      const challengeResponses = {
+        USERNAME: eventObj.email,
+        NEW_PASSWORD: newPassword,
+      };
+
+      const challengeParams = {
+        ClientId: userClientID,
+        ChallengeName: response.ChallengeName,
+        Session: response.Session,
+        ChallengeResponses: challengeResponses,
+      };
+
+      const challengeResponse = await cognito
+        .respondToAuthChallenge(challengeParams)
+        .promise();
+      console.log(
+        "~~~challenge response from signinhandler",
+        challengeResponse
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          accessToken: challengeResponse.AuthenticationResult.AccessToken,
+        }),
+      };
+    } else {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          accessToken: response.AuthenticationResult.IdToken
+        }),
+      };
+    }
   } catch (error) {
-    console.log("We are in catch block(signinHandler)",error.message);
+    console.log("We are in catch block(signinHandler)", error.message);
 
     return {
       statusCode: 400,
@@ -217,8 +248,8 @@ const getTablesHandler = async (event) => {
       body: JSON.stringify({ tables: data.Items }),
     };
   } catch (error) {
-    console.log("getTablesHandler catch block",errpr.message);
-    
+    console.log("getTablesHandler catch block", errpr.message);
+
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),

@@ -19,6 +19,7 @@
             "cognito-idp:AdminCreateUser",
             "cognito-idp:InitiateAuth",
             "cognito-idp:AdminInitiateAuth",
+            "cognito-idp:RespondToAuthChallenge",
             "cognito-idp:GetIdentityProviderByIdentifier",
             "cognito-idp:ListUserPoolClients",
             "cognito-idp:ListUserPools",
