@@ -94,7 +94,7 @@ const signupHandler = async (event) => {
   }
 
   const params = {
-    userPoolId: userPoolID,
+    UserPoolId: userPoolID,
     Username: eventObj.email,
     UserAttributes: [
       { Name: "custom:firstName", Value: eventObj.firstName },
