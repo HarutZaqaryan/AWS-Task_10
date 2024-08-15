@@ -17,6 +17,7 @@
             "kms:Decrypt",
             "cognito-idp:GetUser",
             "cognito-idp:AdminCreateUser",
+            "cognito-idp:InitiateAuth",
             "cognito-idp:AdminInitiateAuth",
             "cognito-idp:GetIdentityProviderByIdentifier",
             "cognito-idp:ListUserPoolClients",
