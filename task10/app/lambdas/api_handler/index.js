@@ -7,7 +7,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const T_tables = process.env.tables_table || "Tables";
 const T_reservations = process.env.reservations_table || "Reservations";
 const userPoolId = process.env.booking_userpool || "simple-booking-userpool";
-const clientId = process.env.booking_client_id || "your-client-id"; 
+const clientId = process.env.booking_client_id || "your-client-id";
 
 export const handler = async (event) => {
   console.log("~~~EVENT~~~~", event);
@@ -18,19 +18,13 @@ export const handler = async (event) => {
   const path = event.path;
   console.log("~~~path~~~~", path);
 
-  const eventBody = event.body
+  const eventBody = event.body;
   console.log("~~~event body~~~~", eventBody);
 
-  if (
-    path === "/signup" &&
-    httpMethod === "POST"
-  ) {
+  if (path === "/signup" && httpMethod === "POST") {
     console.log("~~~inside 1~~~~");
     return await signupHandler(eventBody);
-  } else if (
-    path === "/signin" &&
-    httpMethod === "POST"
-  ) {
+  } else if (path === "/signin" && httpMethod === "POST") {
     console.log("~~~inside 2~~~~");
     return await signinHandler(eventBody);
   } else if (
@@ -66,23 +60,23 @@ export const handler = async (event) => {
 
 // /signup POST
 const signupHandler = async (event) => {
-  console.log("We in signupHandler, event is - ",event);
-  
-  const { firstName, lastName, email, password } = event;
+  console.log("We in signupHandler, event is - ", event);
+  console.log("We in signupHandler, event is - ", typeof event);
 
   const params = {
     UserPoolId: userPoolId,
     Username: email,
     UserAttributes: [
-      { Name: "given_name", Value: firstName },
-      { Name: "family_name", Value: lastName },
-      { Name: "email", Value: email }
+      { Name: "given_name", Value: event.firstName },
+      { Name: "family_name", Value: event.lastName },
+      { Name: "email", Value: event.email },
     ],
     MessageAction: "SUPPRESS",
-    TemporaryPassword: password,
+    TemporaryPassword: event.password,
   };
 
   console.log("~~~signup params~~~~", params);
+  console.log("OTHER SYNTAX", event["firstName"]);
 
   try {
     const req = await cognito.adminCreateUser(params).promise();
@@ -102,14 +96,12 @@ const signupHandler = async (event) => {
 const signinHandler = async (event) => {
   console.log("We in signinHandler, event is - ", event);
 
-  const { email, password } = event;
-
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     AuthParameters: {
       ClientId: clientId,
-      USERNAME: email,
-      PASSWORD: password,
+      USERNAME: event.email,
+      PASSWORD: event.password,
     },
   };
   console.log("~~~signin params~~~~", params);
@@ -157,15 +149,14 @@ const getTablesHandler = async (event) => {
 const createTableHandler = async (event) => {
   console.log("We are in createTableHandler, event is - ", event);
 
-  const { id, number, places, isVip, minOrder } = event;
   const params = {
     TableName: T_tables,
     Item: {
-      id: id || uuidv4(),
-      number,
-      places,
-      isVip,
-      minOrder,
+      id: event.id || uuidv4(),
+      number: event.number,
+      places: event.places,
+      isVip: event.isVip,
+      minOrder: event.minOrder,
     },
   };
   console.log("~~~tables post params~~~~", params);
@@ -215,24 +206,16 @@ const getTableByIdHandler = async (event) => {
 const createReservationHandler = async (event) => {
   console.log("We in createReservationHandler, event is - ", event);
 
-  const {
-    tableNumber,
-    clientName,
-    phoneNumber,
-    date,
-    slotTimeStart,
-    slotTimeEnd,
-  } = event;
   const params = {
     TableName: T_reservations,
     Item: {
       reservationId: uuidv4(),
-      tableNumber,
-      clientName,
-      phoneNumber,
-      date,
-      slotTimeStart,
-      slotTimeEnd,
+      tableNumber: event.tableNumber,
+      clientName: event.clientName,
+      phoneNumber: event.phoneNumber,
+      date: event.date,
+      slotTimeStart: event.slotTimeStart,
+      slotTimeEnd: event.slotTimeEnd,
     },
   };
   console.log("~~~reservations post params~~~~", params);
@@ -273,7 +256,6 @@ const getReservationsHandler = async (event) => {
     };
   }
 };
-
 
 // {
 //   resource: '/signup',
