@@ -14,7 +14,18 @@
             "dynamodb:DeleteItem",
             "ssm:PutParameter",
             "ssm:GetParameter",
-            "kms:Decrypt"
+            "kms:Decrypt",
+            "cognito_idp:DescribeUserPool",
+            "cognito_idp:GetUser",
+            "cognito_idp:ListUsers",
+            "cognito_idp:AdminCreateUser",
+            "cognito_idp:AdminInitiateAuth",
+            "cognito_idp:GetIdentityProviderByIdentifier",
+            "cognito_idp:ListUserPools",
+            "cognito_idp:ListUserPoolClients",
+            "cognito_idp:AdminRespondToAuthChallenge",
+            "cognito_idp:AdminConfirmSignUp",
+            "cognito_idp:AdminSetUserPassword"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -47,6 +58,7 @@
       "/signup": {
         "enable_cors": true,
         "POST": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
@@ -61,6 +73,7 @@
       "/signin": {
         "enable_cors": true,
         "POST": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
@@ -75,6 +88,7 @@
       "/tables": {
         "enable_cors": true,
         "POST": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
@@ -86,6 +100,7 @@
           "default_error_pattern": true
         },
         "GET": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
@@ -100,6 +115,7 @@
       "/reservations": {
         "enable_cors": true,
         "POST": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
@@ -111,6 +127,7 @@
           "default_error_pattern": true
         },
         "GET": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",

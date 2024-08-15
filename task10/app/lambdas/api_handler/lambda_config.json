@@ -12,7 +12,7 @@
   "event_sources": [],
   "env_variables": {
     "tables_table":"${tables_table}",
-    "reservations_table":"${Reservations}",
+    "reservations_table":"${reservations_table}",
     "booking_userpool":"${simple-booking-userpool}"
   },
   "publish_version": false,
