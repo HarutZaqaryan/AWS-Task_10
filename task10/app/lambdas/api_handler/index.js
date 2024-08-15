@@ -172,15 +172,15 @@ const signinHandler = async (event) => {
   try {
     console.log("We are in try block(signinHandler)");
 
-    const response = await cognito.initiateAuth(params).promise();
+    // const response = await cognito.initiateAuth(params).promise();
+    const response = await cognito.adminInitiateAuth(params).promise();
     console.log("~~~response from signinhandler",response);
     // const idToken = response.AuthenticationResult.IdToken;
     // return idToken;
     return {
       statusCode: 200,
       body: JSON.stringify({
-        // accessToken: response.AuthenticationResult.IdToken,
-        token: response.AuthenticationResult.IdToken,
+        accessToken: response.AuthenticationResult.IdToken,
       }),
     };
   } catch (error) {
