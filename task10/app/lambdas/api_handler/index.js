@@ -62,17 +62,20 @@ export const handler = async (event) => {
 const signupHandler = async (event) => {
   console.log("We in signupHandler, event is - ", event);
   console.log("We in signupHandler, event is - ", typeof event);
+  const eventObj = JSON.parse(event);
+  console.log("We in signupHandler, event obj(parsed) - ",  eventObj);
+  console.log("We in signupHandler, event obj(parsed) type is - ",typeof  eventObj);
 
   const params = {
     UserPoolId: userPoolId,
-    Username: email,
+    Username: eventObj.email,
     UserAttributes: [
-      { Name: "given_name", Value: event.firstName },
-      { Name: "family_name", Value: event.lastName },
-      { Name: "email", Value: event.email },
+      { Name: "given_name", Value: eventObj.firstName },
+      { Name: "family_name", Value: eventObj.lastName },
+      { Name: "email", Value: eventObj.email },
     ],
     MessageAction: "SUPPRESS",
-    TemporaryPassword: event.password,
+    TemporaryPassword: eventObj.password,
   };
 
   console.log("~~~signup params~~~~", params);
@@ -95,13 +98,14 @@ const signupHandler = async (event) => {
 // /signin POST
 const signinHandler = async (event) => {
   console.log("We in signinHandler, event is - ", event);
+  const eventObj = JSON.parse(event);
 
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     AuthParameters: {
       ClientId: clientId,
-      USERNAME: event.email,
-      PASSWORD: event.password,
+      USERNAME: eventObj.email,
+      PASSWORD: eventObj.password,
     },
   };
   console.log("~~~signin params~~~~", params);
@@ -148,15 +152,16 @@ const getTablesHandler = async (event) => {
 // /tables POST
 const createTableHandler = async (event) => {
   console.log("We are in createTableHandler, event is - ", event);
+  const eventObj = JSON.parse(event);
 
   const params = {
     TableName: T_tables,
     Item: {
-      id: event.id || uuidv4(),
-      number: event.number,
-      places: event.places,
-      isVip: event.isVip,
-      minOrder: event.minOrder,
+      id: eventObj.id || uuidv4(),
+      number: eventObj.number,
+      places: eventObj.places,
+      isVip: eventObj.isVip,
+      minOrder: eventObj.minOrder,
     },
   };
   console.log("~~~tables post params~~~~", params);
@@ -178,8 +183,10 @@ const createTableHandler = async (event) => {
 // /tables/{tableId} GET
 const getTableByIdHandler = async (event) => {
   console.log("We in getTableByIdHandler, event is - ", event);
+  const eventObj = JSON.parse(event);
 
-  const tableId = event.resource.split("/")[2];
+
+  const tableId = eventObj.resource.split("/")[2];
   const params = {
     TableName: T_tables,
     Key: {
@@ -205,17 +212,18 @@ const getTableByIdHandler = async (event) => {
 // /reservations POST
 const createReservationHandler = async (event) => {
   console.log("We in createReservationHandler, event is - ", event);
+  const eventObj = JSON.parse(event);
 
   const params = {
     TableName: T_reservations,
     Item: {
       reservationId: uuidv4(),
-      tableNumber: event.tableNumber,
-      clientName: event.clientName,
-      phoneNumber: event.phoneNumber,
-      date: event.date,
-      slotTimeStart: event.slotTimeStart,
-      slotTimeEnd: event.slotTimeEnd,
+      tableNumber: eventObj.tableNumber,
+      clientName: eventObj.clientName,
+      phoneNumber: eventObj.phoneNumber,
+      date: eventObj.date,
+      slotTimeStart: eventObj.slotTimeStart,
+      slotTimeEnd: eventObj.slotTimeEnd,
     },
   };
   console.log("~~~reservations post params~~~~", params);
