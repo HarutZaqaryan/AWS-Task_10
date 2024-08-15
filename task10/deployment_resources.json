@@ -62,7 +62,7 @@
       "/signup": {
         "enable_cors": false,
         "POST": {
-          "enable_proxy": true,
+          "enable_proxy": false,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
@@ -75,7 +75,7 @@
         }
       },
       "/signin": {
-        "enable_cors": false,
+        "enable_cors": true,
         "POST": {
           "enable_proxy": true,
           "authorization_type": "NONE",

@@ -63,8 +63,11 @@ const signupHandler = async (event) => {
   console.log("We in signupHandler, event is - ", event);
   console.log("We in signupHandler, event is - ", typeof event);
   const eventObj = JSON.parse(event);
-  console.log("We in signupHandler, event obj(parsed) - ",  eventObj);
-  console.log("We in signupHandler, event obj(parsed) type is - ",typeof  eventObj);
+  console.log("We in signupHandler, event obj(parsed) - ", eventObj);
+  console.log(
+    "We in signupHandler, event obj(parsed) type is - ",
+    typeof eventObj
+  );
 
   const params = {
     UserPoolId: userPoolId,
@@ -79,15 +82,16 @@ const signupHandler = async (event) => {
   };
 
   console.log("~~~signup params~~~~", params);
-  console.log("OTHER SYNTAX", event["firstName"]);
 
   try {
+    console.log("We are in try block(signupHandler)");
     const req = await cognito.adminCreateUser(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Sign-up process is successful" }),
     };
   } catch (error) {
+    console.log("We are in catch block(signupHandler)");
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -111,6 +115,8 @@ const signinHandler = async (event) => {
   console.log("~~~signin params~~~~", params);
 
   try {
+    console.log("We are in try block(signinHandler)");
+
     const response = await cognito.initiateAuth(params).promise();
     return {
       statusCode: 200,
@@ -119,6 +125,8 @@ const signinHandler = async (event) => {
       }),
     };
   } catch (error) {
+    console.log("We are in try block(signinHandler)");
+
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -184,7 +192,6 @@ const createTableHandler = async (event) => {
 const getTableByIdHandler = async (event) => {
   console.log("We in getTableByIdHandler, event is - ", event);
   const eventObj = JSON.parse(event);
-
 
   const tableId = eventObj.resource.split("/")[2];
   const params = {
