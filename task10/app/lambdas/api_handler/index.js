@@ -10,8 +10,8 @@ const T_reservations = process.env.reservations_table || "Reservations000";
 console.log("~~~T_reservations~~~~", T_reservations);
 const userPoolId = process.env.booking_userpool || "simple-booking-userpool000";
 console.log("~~~user_pool_id~~~~", userPoolId);
-const clientId = process.env.booking_client_id || "your-client-id000";
-console.log("~~~clientID~~~~", clientId);
+// const clientId = process.env.booking_client_id || "your-client-id000";
+// console.log("~~~clientID~~~~", clientId);
 
 export const handler = async (event) => {
   console.log("~~~EVENT~~~~", event);
@@ -87,7 +87,7 @@ const signupHandler = async (event) => {
       body: JSON.stringify({ message: "Sign-up process is successful" }),
     };
   } catch (error) {
-    console.log("We are in catch block(signupHandler)");
+    console.log("We are in catch block(signupHandler)",error.message);
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -103,7 +103,8 @@ const signinHandler = async (event) => {
   const params = {
     // AuthFlow: "USER_PASSWORD_AUTH",
     AuthFlow: "ADMIN_NO_SRP_AUTH",
-    ClientId: clientId,
+    // ClientId: clientId,
+    ClientId: "4qsja8sien9cv8fpgtidukrh7p",
     AuthParameters: {
       USERNAME: eventObj.email,
       PASSWORD: eventObj.password,

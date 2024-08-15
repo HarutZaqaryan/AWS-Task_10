@@ -44,11 +44,11 @@
     "username_attributes": [],
     "custom_attributes": [
       {
-        "name": "lastName",
+        "name": "firstName",
         "type": "String"
       },
       {
-        "name": "firstName",
+        "name": "lastName",
         "type": "String"
       }
     ],
