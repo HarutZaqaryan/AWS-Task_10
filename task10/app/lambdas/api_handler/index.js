@@ -162,8 +162,8 @@ const signinHandler = async (event) => {
   }
 
   const params = {
-    // AuthFlow: "USER_PASSWORD_AUTH",
-    AuthFlow: "ADMIN_NO_SRP_AUTH",
+    AuthFlow: "USER_PASSWORD_AUTH",
+    // AuthFlow: "ADMIN_NO_SRP_AUTH",
     // ClientId: clientId,
     ClientId: userClientID,
     AuthParameters: {
