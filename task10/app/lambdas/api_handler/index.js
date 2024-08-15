@@ -11,6 +11,7 @@ console.log("~~~T_reservations~~~~", T_reservations);
 const userPoolName = process.env.booking_userpool || "simple-booking-userpool000";
 console.log("~~~user_pool_id~~~~", userPoolName);
 let userPoolID;
+let userClientID;
 // const clientId = process.env.booking_client_id || "your-client-id000";
 // console.log("~~~clientID~~~~", clientId);
 
@@ -79,6 +80,30 @@ const getuserPoolNameByName = async (userPoolName) => {
   }
 };
 
+const getClientId = async () => {
+  try {
+    const params = {
+      UserPoolId: userPoolID,
+      MaxResults: 60 // Adjust this if you expect more clients
+    };
+
+    const response = await cognito.listUserPoolClients(params).promise();
+    console.log("Client List Response:", response);
+
+    // Assuming you want the first client or based on some criteria
+    const client = response.UserPoolClients[0]; // Change this if needed
+
+    if (client) {
+      return client.ClientId;
+    } else {
+      throw new Error("No Client ID found");
+    }
+  } catch (error) {
+    console.error("Error fetching Client ID:", error);
+    throw error;
+  }
+};
+
 // /signup POST
 const signupHandler = async (event) => {
   console.log("We are in signupHandler, event is - ", event);
@@ -128,11 +153,15 @@ const signinHandler = async (event) => {
   console.log("We in signinHandler, event is - ", event);
   const eventObj = JSON.parse(event);
 
+  if (!userClientID) {
+    userClientID = await getClientId();
+  }
+
   const params = {
     // AuthFlow: "USER_PASSWORD_AUTH",
     AuthFlow: "ADMIN_NO_SRP_AUTH",
     // ClientId: clientId,
-    ClientId: "4qsja8sien9cv8fpgtidukrh7p",
+    ClientId: userClientID,
     AuthParameters: {
       USERNAME: eventObj.email,
       PASSWORD: eventObj.password,
