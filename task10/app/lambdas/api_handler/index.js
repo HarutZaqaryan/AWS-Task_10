@@ -7,6 +7,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const T_tables = process.env.tables_table || "Tables";
 const T_reservations = process.env.reservations_table || "Reservations";
 const userPoolId = process.env.booking_userpool || "simple-booking-userpool";
+const clientId = process.env.booking_client_id || "your-client-id"; 
 
 export const handler = async (event) => {
   console.log("~~~EVENT~~~~", event);
@@ -71,6 +72,8 @@ export const handler = async (event) => {
 
 // /signup POST
 const signupHandler = async (event) => {
+  console.log("We here");
+  
   const { firstName, lastName, email, password } = event;
 
   const params = {
@@ -108,7 +111,7 @@ const signinHandler = async (event) => {
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     AuthParameters: {
-      ClientId: uuidv4(),
+      ClientId: clientId,
       USERNAME: email,
       PASSWORD: password,
     },
