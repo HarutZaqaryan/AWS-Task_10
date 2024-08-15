@@ -98,6 +98,7 @@ const signinHandler = async (event) => {
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     AuthParameters: {
+      ClientId:uuidv4(),
       USERNAME: email,
       PASSWORD: password,
     },
