@@ -27,14 +27,7 @@ export const handler = async (event) => {
   } else if (path === "/signin" && httpMethod === "POST") {
     console.log("~~~inside 2~~~~");
     return await signinHandler(eventBody);
-  } else if (
-    eventBody.tableNumber &&
-    eventBody.clientName &&
-    eventBody.phoneNumber &&
-    eventBody.date &&
-    eventBody.slotTimeStart &&
-    eventBody.slotTimeEnd
-  ) {
+  } else if (path === "/tables" && httpMethod === "POST") {
     console.log("~~~inside 3~~~~");
     return await createReservationHandler(eventBody);
   } else if (path === "/tables" && httpMethod === "GET") {
@@ -43,7 +36,7 @@ export const handler = async (event) => {
   } else if (path === "/tables" && httpMethod === "POST") {
     console.log("~~~inside 5~~~~");
     return await createTableHandler(eventBody);
-  } else if (path && path.startsWith("/tables/") && event.method === "GET") {
+  } else if (path && path.startsWith("/tables/") && httpMethod === "GET") {
     console.log("~~~inside 6~~~~");
     return await getTableByIdHandler(eventBody);
   } else if (path === "/reservations" && httpMethod === "GET") {
