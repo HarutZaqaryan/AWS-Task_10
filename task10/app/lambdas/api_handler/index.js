@@ -8,8 +8,9 @@ const T_tables = process.env.tables_table || "Tables000";
 console.log("~~~T_tables~~~~", T_tables);
 const T_reservations = process.env.reservations_table || "Reservations000";
 console.log("~~~T_reservations~~~~", T_reservations);
-const userPoolId = process.env.booking_userpool || "simple-booking-userpool000";
-console.log("~~~user_pool_id~~~~", userPoolId);
+const userPoolName = process.env.booking_userpool || "simple-booking-userpool000";
+console.log("~~~user_pool_id~~~~", userPoolName);
+let userPoolID;
 // const clientId = process.env.booking_client_id || "your-client-id000";
 // console.log("~~~clientID~~~~", clientId);
 
@@ -55,6 +56,29 @@ export const handler = async (event) => {
   }
 };
 
+const getuserPoolNameByName = async (userPoolName) => {
+  try {
+    const params = {
+      MaxResults: 60,
+    };
+    const response = await cognito.listUserPools(params).promise();
+    console.log("~~~Response from getuserPoolNamebyName",response);
+
+    const userPool = response.UserPools.find(
+      (pool) => pool.Name === userPoolName
+    );
+ 
+    if (userPool) {
+      return userPool.Id;
+    } else {
+      throw new Error(`User pool with name ${userPoolName} not found`);
+    }
+  } catch (error) {
+    console.error("Error fetching User Pool ID:", error);
+    throw error;
+  }
+};
+
 // /signup POST
 const signupHandler = async (event) => {
   console.log("We are in signupHandler, event is - ", event);
@@ -65,8 +89,12 @@ const signupHandler = async (event) => {
     typeof eventObj
   );
 
+  if (!userPoolID) {
+    userPoolID = await getuserPoolNameByName(userPoolName);
+  }
+
   const params = {
-    UserPoolId: userPoolId,
+    userPoolId: userPoolID,
     Username: eventObj.email,
     UserAttributes: [
       { Name: "custom:firstName", Value: eventObj.firstName },
