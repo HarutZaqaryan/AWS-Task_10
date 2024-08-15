@@ -4,10 +4,14 @@ import { v4 as uuidv4 } from "uuid";
 const cognito = new AWS.CognitoIdentityServiceProvider();
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const T_tables = process.env.tables_table || "Tables";
-const T_reservations = process.env.reservations_table || "Reservations";
-const userPoolId = process.env.booking_userpool || "simple-booking-userpool";
-const clientId = process.env.booking_client_id || "your-client-id";
+const T_tables = process.env.tables_table || "Tables000";
+console.log("~~~T_tables~~~~", T_tables);
+const T_reservations = process.env.reservations_table || "Reservations000";
+console.log("~~~T_reservations~~~~", T_reservations);
+const userPoolId = process.env.booking_userpool || "simple-booking-userpool000";
+console.log("~~~user_pool_id~~~~", userPoolId);
+const clientId = process.env.booking_client_id || "your-client-id000";
+console.log("~~~clientID~~~~", clientId);
 
 export const handler = async (event) => {
   console.log("~~~EVENT~~~~", event);
@@ -53,12 +57,11 @@ export const handler = async (event) => {
 
 // /signup POST
 const signupHandler = async (event) => {
-  console.log("We in signupHandler, event is - ", event);
-  console.log("We in signupHandler, event is - ", typeof event);
+  console.log("We are in signupHandler, event is - ", event);
   const eventObj = JSON.parse(event);
-  console.log("We in signupHandler, event obj(parsed) - ", eventObj);
+  console.log("We are in signupHandler, event obj(parsed) - ", eventObj);
   console.log(
-    "We in signupHandler, event obj(parsed) type is - ",
+    "We are in signupHandler, event obj(parsed) type is - ",
     typeof eventObj
   );
 
@@ -66,8 +69,8 @@ const signupHandler = async (event) => {
     UserPoolId: userPoolId,
     Username: eventObj.email,
     UserAttributes: [
-      { Name: "firstName", Value: eventObj.firstName },
-      { Name: "lastName", Value: eventObj.lastName },
+      { Name: "custom:firstName", Value: eventObj.firstName },
+      { Name: "custom:lastName", Value: eventObj.lastName },
       { Name: "email", Value: eventObj.email },
     ],
     MessageAction: "SUPPRESS",
