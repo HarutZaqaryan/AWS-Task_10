@@ -66,7 +66,7 @@ export const handler = async (event) => {
 
 // /signup POST
 const signupHandler = async (event) => {
-  console.log("We here");
+  console.log("We in signupHandler, event is - ",event);
   
   const { firstName, lastName, email, password } = event;
 
@@ -100,6 +100,8 @@ const signupHandler = async (event) => {
 
 // /signin POST
 const signinHandler = async (event) => {
+  console.log("We in signinHandler, event is - ", event);
+
   const { email, password } = event;
 
   const params = {
@@ -130,6 +132,8 @@ const signinHandler = async (event) => {
 
 // /tables GET
 const getTablesHandler = async (event) => {
+  console.log("We in getTablesHandler, event is - ", event);
+
   const params = {
     TableName: T_tables,
   };
@@ -151,6 +155,8 @@ const getTablesHandler = async (event) => {
 
 // /tables POST
 const createTableHandler = async (event) => {
+  console.log("We are in createTableHandler, event is - ", event);
+
   const { id, number, places, isVip, minOrder } = event;
   const params = {
     TableName: T_tables,
@@ -180,6 +186,8 @@ const createTableHandler = async (event) => {
 
 // /tables/{tableId} GET
 const getTableByIdHandler = async (event) => {
+  console.log("We in getTableByIdHandler, event is - ", event);
+
   const tableId = event.resource.split("/")[2];
   const params = {
     TableName: T_tables,
@@ -205,6 +213,8 @@ const getTableByIdHandler = async (event) => {
 
 // /reservations POST
 const createReservationHandler = async (event) => {
+  console.log("We in createReservationHandler, event is - ", event);
+
   const {
     tableNumber,
     clientName,
@@ -243,6 +253,8 @@ const createReservationHandler = async (event) => {
 
 // /reservations GET
 const getReservationsHandler = async (event) => {
+  console.log("We in getReservationsHandler, event is - ", event);
+
   const params = {
     TableName: T_reservations,
   };
