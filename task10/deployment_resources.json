@@ -60,7 +60,7 @@
     "dependencies": [],
     "resources": {
       "/signup": {
-        "enable_cors": true,
+        "enable_cors": false,
         "POST": {
           "enable_proxy": true,
           "authorization_type": "NONE",
@@ -75,7 +75,7 @@
         }
       },
       "/signin": {
-        "enable_cors": true,
+        "enable_cors": false,
         "POST": {
           "enable_proxy": true,
           "authorization_type": "NONE",
@@ -145,7 +145,7 @@
       }
     },
     "minimum_compression_size": 0,
-    "authorizers": {
+    "authorizer": {
       "task10_api_authorizer": {
         "type": "COGNITO_USER_POOLS",
         "identity_source": "method.request.header.Authorization",

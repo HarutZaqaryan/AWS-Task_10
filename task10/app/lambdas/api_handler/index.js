@@ -14,14 +14,31 @@ export const handler = async (event) => {
   console.log("~~~httpMethod~~~~", httpMethod);
   const path = event.requestContext.http.path;
   console.log("~~~path~~~~", path);
-  const eventBody = JSON.parse(event.body.trim().replace(/\\r\\n|\\n|\\r/g, '').replace(/\\"/g, '"').replace(/\s{2,}/g, ' '));
+  const eventBody = JSON.parse(
+    event.body
+      .trim()
+      .replace(/\\r\\n|\\n|\\r/g, "")
+      .replace(/\\"/g, '"')
+      .replace(/\s{2,}/g, " ")
+  );
   console.log("~~~event body~~~~", eventBody);
 
-
-  if (eventBody.firstName && eventBody.lastName && eventBody.email && eventBody.password) {
+  if (
+    eventBody.firstName &&
+    eventBody.lastName &&
+    eventBody.email &&
+    eventBody.password &&
+    path === "/signup" &&
+    httpMethod === "POST"
+  ) {
     console.log("~~~inside 1~~~~");
     return await signupHandler(eventBody);
-  } else if (eventBody.email && eventBody.password) {
+  } else if (
+    eventBody.email &&
+    eventBody.password &&
+    path === "/signin" &&
+    httpMethod === "POST"
+  ) {
     console.log("~~~inside 2~~~~");
     return await signinHandler(eventBody);
   } else if (
@@ -37,14 +54,10 @@ export const handler = async (event) => {
   } else if (path === "/tables" && httpMethod === "GET") {
     console.log("~~~inside 4~~~~");
     return await getTablesHandler(eventBody);
-  } else if (path=== "/tables" && httpMethod === "POST") {
+  } else if (path === "/tables" && httpMethod === "POST") {
     console.log("~~~inside 5~~~~");
     return await createTableHandler(eventBody);
-  } else if (
-    path &&
-    path.startsWith("/tables/") &&
-    event.method === "GET"
-  ) {
+  } else if (path && path.startsWith("/tables/") && event.method === "GET") {
     console.log("~~~inside 6~~~~");
     return await getTableByIdHandler(eventBody);
   } else if (path === "/reservations" && httpMethod === "GET") {
@@ -67,9 +80,10 @@ const signupHandler = async (event) => {
     UserPoolId: userPoolId,
     Username: email,
     UserAttributes: [
-      { Name: "given_name", Value: firstName },
-      { Name: "family_name", Value: lastName },
+      { Name: "firstName", Value: firstName },
+      { Name: "lastName", Value: lastName },
       { Name: "email", Value: email },
+      { Name: "password", Value: password },
     ],
     MessageAction: "SUPPRESS",
     TemporaryPassword: password,
@@ -78,7 +92,7 @@ const signupHandler = async (event) => {
   console.log("~~~signup params~~~~", params);
 
   try {
-    await cognito.adminCreateUser(params).promise();
+    const req = await cognito.adminCreateUser(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ message: "Sign-up process is successful" }),
@@ -98,7 +112,7 @@ const signinHandler = async (event) => {
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     AuthParameters: {
-      ClientId:uuidv4(),
+      ClientId: uuidv4(),
       USERNAME: email,
       PASSWORD: password,
     },
