@@ -20,6 +20,7 @@
             "cognito-idp:AdminInitiateAuth",
             "cognito-idp:GetIdentityProviderByIdentifier",
             "cognito-idp:ListUserPoolClients",
+            "cognito-idp:ListUserPools",
             "cognito-idp:AdminRespondToAuthChallenge"
           ],
           "Effect": "Allow",
