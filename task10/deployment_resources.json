@@ -69,19 +69,20 @@
     "dependencies": [],
     "authorizers": {
       "authorizer": {
-        "task10_api_authorizer": {
+
           "type": "COGNITO_USER_POOLS",
           "identity_source": "method.request.header.Authorization",
-          "ttl": 300,
-          "user_pools": ["${booking_userpool}"]
-        }
+          "user_pools": [
+            "${booking_userpool}"
+          ],
+          "ttl": 300
       }
     },
     "resources": {
       "/signup": {
         "enable_cors": false,
         "POST": {
-          "enable_proxy": false,
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",

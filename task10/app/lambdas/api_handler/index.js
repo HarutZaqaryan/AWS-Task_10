@@ -98,9 +98,10 @@ const signinHandler = async (event) => {
   const eventObj = JSON.parse(event);
 
   const params = {
-    AuthFlow: "USER_PASSWORD_AUTH",
+    // AuthFlow: "USER_PASSWORD_AUTH",
+    AuthFlow: "ADMIN_NO_SRP_AUTH",
+    ClientId: clientId,
     AuthParameters: {
-      ClientId: clientId,
       USERNAME: eventObj.email,
       PASSWORD: eventObj.password,
     },
@@ -111,12 +112,14 @@ const signinHandler = async (event) => {
     console.log("We are in try block(signinHandler)");
 
     const response = await cognito.initiateAuth(params).promise();
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        accessToken: response.AuthenticationResult.IdToken,
-      }),
-    };
+    const idToken = response.AuthenticationResult.IdToken;
+    return idToken;
+    // return {
+    //   statusCode: 200,
+    //   body: JSON.stringify({
+    //     accessToken: response.AuthenticationResult.IdToken,
+    //   }),
+    // };
   } catch (error) {
     console.log("We are in try block(signinHandler)");
 
