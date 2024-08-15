@@ -36,13 +36,13 @@ export const handler = async (event) => {
     return await signinHandler(eventBody);
   } else if (path === "/tables" && httpMethod === "POST") {
     console.log("~~~inside 3~~~~");
-    return await createReservationHandler(eventBody);
+    return await createTableHandler(eventBody);
   } else if (path === "/tables" && httpMethod === "GET") {
     console.log("~~~inside 4~~~~");
     return await getTablesHandler(eventBody);
-  } else if (path === "/tables" && httpMethod === "POST") {
+  } else if (path === "/reservations" && httpMethod === "POST") {
     console.log("~~~inside 5~~~~");
-    return await createTableHandler(eventBody);
+    return await createReservationHandler(eventBody);
   } else if (path && path.startsWith("/tables/") && httpMethod === "GET") {
     console.log("~~~inside 6~~~~");
     return await getTableByIdHandler(eventBody);
@@ -218,7 +218,7 @@ const signinHandler = async (event) => {
       return {
         statusCode: 200,
         body: JSON.stringify({
-          accessToken: response.AuthenticationResult.IdToken
+          accessToken: response.AuthenticationResult.IdToken,
         }),
       };
     }
