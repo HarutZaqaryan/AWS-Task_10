@@ -157,10 +157,15 @@ const signinHandler = async (event) => {
     userClientID = await getClientId();
   }
 
+  if (!userPoolID) {
+    userPoolID = await getuserPoolNameByName(userPoolName);
+  }
+
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
     // AuthFlow: "ADMIN_NO_SRP_AUTH",
     // ClientId: clientId,
+    UserPoolId:userPoolID,
     ClientId: userClientID,
     AuthParameters: {
       USERNAME: eventObj.email,
