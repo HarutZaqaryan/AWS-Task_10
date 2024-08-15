@@ -66,8 +66,8 @@ const signupHandler = async (event) => {
     UserPoolId: userPoolId,
     Username: eventObj.email,
     UserAttributes: [
-      { Name: "given_name", Value: eventObj.firstName },
-      { Name: "family_name", Value: eventObj.lastName },
+      { Name: "firstName", Value: eventObj.firstName },
+      { Name: "lastName", Value: eventObj.lastName },
       { Name: "email", Value: eventObj.email },
     ],
     MessageAction: "SUPPRESS",
