@@ -22,18 +22,12 @@ export const handler = async (event) => {
   console.log("~~~event body~~~~", eventBody);
 
   if (
-    eventBody.firstName &&
-    eventBody.lastName &&
-    eventBody.email &&
-    eventBody.password &&
     path === "/signup" &&
     httpMethod === "POST"
   ) {
     console.log("~~~inside 1~~~~");
     return await signupHandler(eventBody);
   } else if (
-    eventBody.email &&
-    eventBody.password &&
     path === "/signin" &&
     httpMethod === "POST"
   ) {
