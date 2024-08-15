@@ -16,7 +16,7 @@ export const handler = async (event) => {
 
   const path = event.path;
   console.log("~~~path~~~~", path);
-  
+
   const eventBody = event.body
   console.log("~~~event body~~~~", eventBody);
 
@@ -77,10 +77,9 @@ const signupHandler = async (event) => {
     UserPoolId: userPoolId,
     Username: email,
     UserAttributes: [
-      { Name: "firstName", Value: firstName },
-      { Name: "lastName", Value: lastName },
-      { Name: "email", Value: email },
-      { Name: "password", Value: password },
+      { Name: "given_name", Value: firstName },
+      { Name: "family_name", Value: lastName },
+      { Name: "email", Value: email }
     ],
     MessageAction: "SUPPRESS",
     TemporaryPassword: password,
