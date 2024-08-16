@@ -267,7 +267,7 @@ const createTableHandler = async (event) => {
   const params = {
     TableName: T_tables,
     Item: {
-      id: eventObj.id || uuidv4(),
+      id:eventObj.id.toString() || uuidv4(),
       number: eventObj.number,
       places: eventObj.places,
       isVip: eventObj.isVip,
@@ -278,14 +278,14 @@ const createTableHandler = async (event) => {
 
   try {
     console.log("~~~We are in try block(createTableHandler)");
-    
+
     const data = await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ id: params.Item.id }),
     };
   } catch (error) {
-    console.log("~~~We are in catch block(createTableHandler)",error.message);
+    console.log("~~~We are in catch block(createTableHandler)", error.message);
 
     return {
       statusCode: 400,
@@ -317,7 +317,7 @@ const getTableByIdHandler = async (event) => {
       body: JSON.stringify(data.Item),
     };
   } catch (error) {
-    console.log("~~~We are in catch block(getbyhandler)",error.message);
+    console.log("~~~We are in catch block(getbyhandler)", error.message);
 
     return {
       statusCode: 400,
@@ -354,7 +354,7 @@ const createReservationHandler = async (event) => {
       body: JSON.stringify({ reservationId: params.Item.reservationId }),
     };
   } catch (error) {
-    console.log("~~~We are in catch block(createReserv)",error.message);
+    console.log("~~~We are in catch block(createReserv)", error.message);
 
     return {
       statusCode: 400,
@@ -381,7 +381,7 @@ const getReservationsHandler = async (event) => {
       body: JSON.stringify({ reservations: data.Items }),
     };
   } catch (error) {
-    console.log("~~~We are in catch block(getReserv)",error.message);
+    console.log("~~~We are in catch block(getReserv)", error.message);
 
     return {
       statusCode: 400,
