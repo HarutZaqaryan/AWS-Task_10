@@ -386,28 +386,28 @@ const createReservationHandler = async (event) => {
     };
   }
 
-  // Check for overlapping reservations
-  const reservationParams = {
-    TableName: T_reservations,
-    FilterExpression: "tableNumber = :tableNumber AND slotTimeStart < :endTime AND slotTimeEnd > :startTime",
-    ExpressionAttributeValues: {
-      ":tableNumber": eventObj.tableNumber,
-      ":startTime": eventObj.slotTimeStart,
-      ":endTime": eventObj.slotTimeEnd,
-    },
-  };
-  console.log("~~~reservationParams", reservationParams);
+  // // Check for overlapping reservations
+  // const reservationParams = {
+  //   TableName: T_reservations,
+  //   FilterExpression: "tableNumber = :tableNumber AND slotTimeStart < :endTime AND slotTimeEnd > :startTime",
+  //   ExpressionAttributeValues: {
+  //     ":tableNumber": eventObj.tableNumber,
+  //     ":startTime": eventObj.slotTimeStart,
+  //     ":endTime": eventObj.slotTimeEnd,
+  //   },
+  // };
+  // console.log("~~~reservationParams", reservationParams);
   
 
-  const reservationData = await dynamoDb.scan(reservationParams).promise();
-  console.log("~~~reservationData", reservationData);
+  // const reservationData = await dynamoDb.scan(reservationParams).promise();
+  // console.log("~~~reservationData", reservationData);
 
-  if (reservationData.Items.length > 0) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "Reservation overlaps with an existing one" }),
-    };
-  }
+  // if (reservationData.Items.length > 0) {
+  //   return {
+  //     statusCode: 400,
+  //     body: JSON.stringify({ message: "Reservation overlaps with an existing one" }),
+  //   };
+  // }
 
   // Proceed to create the reservation
   const params = {
