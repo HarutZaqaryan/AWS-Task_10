@@ -299,9 +299,8 @@ const createTableHandler = async (event) => {
 // /tables/{tableId} GET
 const getTableByIdHandler = async (event) => {
   console.log("We in getTableByIdHandler, event is - ", event);
-  const eventObj = JSON.parse(event);
 
-  const tableId = eventObj.path.split("/")[2];
+  const tableId = event.path.split("/")[2];
   console.log("~~~table id from getidhandler",tableId);
   
   const params = {
