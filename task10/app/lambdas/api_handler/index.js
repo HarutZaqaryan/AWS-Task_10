@@ -246,7 +246,7 @@ const getTablesHandler = async (event) => {
 
     const data = await dynamoDb.scan(params).promise();
     console.log("~~~data from getTablesHandler", data);
-    
+
     return {
       statusCode: 200,
       body: JSON.stringify({ tables: data.Items }),
@@ -269,9 +269,9 @@ const createTableHandler = async (event) => {
   const params = {
     TableName: T_tables,
     Item: {
-      id:eventObj.id.toString() || uuidv4(),
-      number: eventObj.number,
-      places: eventObj.places,
+      id: +eventObj.id || uuidv4(),
+      number: +eventObj.number,
+      places: +eventObj.places,
       isVip: eventObj.isVip,
       minOrder: eventObj.minOrder,
     },
@@ -379,6 +379,7 @@ const getReservationsHandler = async (event) => {
     console.log("~~~We are in try block(getReserv)");
 
     const data = await dynamoDb.scan(params).promise();
+    console.log("~~~data from getReserv", data);
     return {
       statusCode: 200,
       body: JSON.stringify({ reservations: data.Items }),
@@ -392,89 +393,3 @@ const getReservationsHandler = async (event) => {
     };
   }
 };
-
-// {
-//   resource: '/signup',
-//   path: '/signup',
-//   httpMethod: 'POST',
-//   headers: {
-//     Accept: '*/*',
-//     'Accept-Encoding': 'gzip, deflate',
-//     'CloudFront-Forwarded-Proto': 'https',
-//     'CloudFront-Is-Desktop-Viewer': 'true',
-//     'CloudFront-Is-Mobile-Viewer': 'false',
-//     'CloudFront-Is-SmartTV-Viewer': 'false',
-//     'CloudFront-Is-Tablet-Viewer': 'false',
-//     'CloudFront-Viewer-ASN': '16509',
-//     'CloudFront-Viewer-Country': 'DE',
-//     'Content-Type': 'application/json',
-//     Host: 'ynv7d7gjv3.execute-api.eu-central-1.amazonaws.com',
-//     'User-Agent': 'python-requests/2.31.0',
-//     Via: '1.1 55107fc1be09ed1afcf3154ed9bd93cc.cloudfront.net (CloudFront)',
-//     'X-Amz-Cf-Id': 'pP-AqA2pU4QIvFrFiNtijKSgwkQdVxjsXFo69nHzUAy5imUHQXxycA==',
-//     'X-Amzn-Trace-Id': 'Root=1-66be0090-76ea0d1b026f0e9121206e9b',
-//     'X-Forwarded-For': '18.153.146.156, 130.176.223.103',
-//     'X-Forwarded-Port': '443',
-//     'X-Forwarded-Proto': 'https'
-//   },
-//   multiValueHeaders: {
-//     Accept: [ '*/*' ],
-//     'Accept-Encoding': [ 'gzip, deflate' ],
-//     'CloudFront-Forwarded-Proto': [ 'https' ],
-//     'CloudFront-Is-Desktop-Viewer': [ 'true' ],
-//     'CloudFront-Is-Mobile-Viewer': [ 'false' ],
-//     'CloudFront-Is-SmartTV-Viewer': [ 'false' ],
-//     'CloudFront-Is-Tablet-Viewer': [ 'false' ],
-//     'CloudFront-Viewer-ASN': [ '16509' ],
-//     'CloudFront-Viewer-Country': [ 'DE' ],
-//     'Content-Type': [ 'application/json' ],
-//     Host: [ 'ynv7d7gjv3.execute-api.eu-central-1.amazonaws.com' ],
-//     'User-Agent': [ 'python-requests/2.31.0' ],
-//     Via: [
-//       '1.1 55107fc1be09ed1afcf3154ed9bd93cc.cloudfront.net (CloudFront)'
-//     ],
-//     'X-Amz-Cf-Id': [ 'pP-AqA2pU4QIvFrFiNtijKSgwkQdVxjsXFo69nHzUAy5imUHQXxycA==' ],
-//     'X-Amzn-Trace-Id': [ 'Root=1-66be0090-76ea0d1b026f0e9121206e9b' ],
-//     'X-Forwarded-For': [ '18.153.146.156, 130.176.223.103' ],
-//     'X-Forwarded-Port': [ '443' ],
-//     'X-Forwarded-Proto': [ 'https' ]
-//   },
-//   queryStringParameters: null,
-//   multiValueQueryStringParameters: null,
-//   pathParameters: null,
-//   stageVariables: null,
-//   requestContext: {
-//     resourceId: 'fd88ff',
-//     resourcePath: '/signup',
-//     httpMethod: 'POST',
-//     extendedRequestId: 'cjUGoFUpliAETjw=',
-//     requestTime: '15/Aug/2024:13:20:16 +0000',
-//     path: '/api/signup',
-//     accountId: '196241772369',
-//     protocol: 'HTTP/1.1',
-//     stage: 'api',
-//     domainPrefix: 'ynv7d7gjv3',
-//     requestTimeEpoch: 1723728016551,
-//     requestId: 'e6caac0c-58eb-4536-8e28-aacacde095be',
-//     identity: {
-//       cognitoIdentityPoolId: null,
-//       accountId: null,
-//       cognitoIdentityId: null,
-//       caller: null,
-//       sourceIp: '18.153.146.156',
-//       principalOrgId: null,
-//       accessKey: null,
-//       cognitoAuthenticationType: null,
-//       cognitoAuthenticationProvider: null,
-//       userArn: null,
-//       userAgent: 'python-requests/2.31.0',
-//       user: null
-//     },
-//     domainName: 'ynv7d7gjv3.execute-api.eu-central-1.amazonaws.com',
-//     deploymentId: '78wk2z',
-//     apiId: 'ynv7d7gjv3'
-//   },
-//   body: '{"firstName": "cmtr-954a4fcc-User", "lastName": "cmtr-954a4fcc-Validation", "email": "cmtr-954a4fcc-validation_user@test.com", "password": "p12345T-048_Gru"}',
-//   isBase64Encoded: false
-// }
-
