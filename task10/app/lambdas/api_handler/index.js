@@ -369,7 +369,7 @@ const getTableByIdHandler = async (event) => {
 
 const createReservationHandler = async (event) => {
   console.log("We in createReservationHandler, event is - ", event);
-  const eventObj = JSON.parse(event.body);
+  const eventObj = JSON.parse(event);
 
   // Check if the table exists
   const tableParams = {
@@ -380,6 +380,7 @@ const createReservationHandler = async (event) => {
   };
 
   const tableData = await dynamoDb.get(tableParams).promise();
+  console.log("~~~tableData~~~",tableData)
   if (!tableData.Item) {
     return {
       statusCode: 400,
