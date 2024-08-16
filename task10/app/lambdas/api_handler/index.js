@@ -267,7 +267,7 @@ const createTableHandler = async (event) => {
   const params = {
     TableName: T_tables,
     Item: {
-      id:eventObj.id.toString() || uuidv4(),
+      id: eventObj.id.toString() || uuidv4(),
       number: eventObj.number,
       places: eventObj.places,
       isVip: eventObj.isVip,
@@ -334,7 +334,8 @@ const createReservationHandler = async (event) => {
   const params = {
     TableName: T_reservations,
     Item: {
-      reservationId: uuidv4(),
+      id: uuidv4(),
+      // reservationId: uuidv4(),
       tableNumber: eventObj.tableNumber,
       clientName: eventObj.clientName,
       phoneNumber: eventObj.phoneNumber,
@@ -348,10 +349,10 @@ const createReservationHandler = async (event) => {
   try {
     console.log("~~~We are in try block(createReserv)");
 
-    await dynamoDb.put(params).promise();
+    const data = await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
-      body: JSON.stringify({ reservationId: params.Item.reservationId }),
+      body: JSON.stringify({ reservationId: params.Item.id }),
     };
   } catch (error) {
     console.log("~~~We are in catch block(createReserv)", error.message);
