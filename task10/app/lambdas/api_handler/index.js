@@ -314,7 +314,7 @@ const getTableByIdHandler = async (event) => {
     const data = await dynamoDb.get(params).promise();
     return {
       statusCode: 200,
-      body: JSON.stringify(data.Item),
+      body: JSON.stringify({data}),
     };
   } catch (error) {
     console.log("~~~We are in catch block(getbyhandler)", error.message);
