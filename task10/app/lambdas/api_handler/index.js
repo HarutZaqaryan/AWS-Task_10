@@ -450,44 +450,45 @@ const createReservationHandler = async (event) => {
     const tableParams = {
       TableName: T_tables,
       Key: {
-        id: eventObj.tableNumber,
+        Hashkey: eventObj.tableNumber,
       },
     };
 
     // Check if the table exists
-    const getTableCommand = new get(tableParams);
 
-    const tableResult = await dynamoDb.send(getTableCommand);
+    const tableResult = await dynamoDb.get(tableParams);
+    console.log("~~~tableResult~~~",tableResult);
+    
 
     if (!tableResult.Item) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Table does not exist" }),
       };
+    } else {
+      // If the table exists, create a reservation
+      const reservParams = {
+        TableName: T_reservations,
+        Item: {
+          id: uuidv4(),
+          tableNumber: eventObj.tableNumber,
+          clientName: eventObj.clientName,
+          phoneNumber: eventObj.phoneNumber,
+          date: eventObj.date,
+          slotTimeStart: eventObj.slotTimeStart,
+          slotTimeEnd: eventObj.slotTimeEnd,
+        },
+      };
+      const reservationId = uuidv4();
+      const putReservationCommand = new put(reservParams);
+
+      await dynamoDb.send(putReservationCommand);
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ reservationId }),
+      };
     }
-
-    // If the table exists, create a reservation
-    const reservParams = {
-      TableName: T_reservations,
-      Item: {
-        id: uuidv4(),
-        tableNumber: eventObj.tableNumber,
-        clientName: eventObj.clientName,
-        phoneNumber: eventObj.phoneNumber,
-        date: eventObj.date,
-        slotTimeStart: eventObj.slotTimeStart,
-        slotTimeEnd: eventObj.slotTimeEnd,
-      },
-    };
-    const reservationId = uuidv4();
-    const putReservationCommand = new put(reservParams);
-
-    await dynamoDb.send(putReservationCommand);
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ reservationId }),
-    };
   } catch (error) {
     console.error("Error creating reservation:", error);
     return {
