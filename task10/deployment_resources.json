@@ -75,13 +75,10 @@
     "dependencies": [],
     "authorizers": {
       "authorizer": {
-
-          "type": "COGNITO_USER_POOLS",
-          "identity_source": "method.request.header.Authorization",
-          "user_pools": [
-            "${booking_userpool}"
-          ],
-          "ttl": 300
+        "type": "COGNITO_USER_POOLS",
+        "identity_source": "method.request.header.Authorization",
+        "user_pools": ["${booking_userpool}"],
+        "ttl": 300
       }
     },
     "resources": {
