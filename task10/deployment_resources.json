@@ -200,26 +200,6 @@
     "read_capacity": 1,
     "write_capacity": 1,
     "global_indexes": [
-      {
-        "index_name": "TableNumberDateIndex",
-        "key_schema": [
-          {
-            "attribute_name": "tableNumber",
-            "key_type": "HASH"
-          },
-          {
-            "attribute_name": "date",
-            "key_type": "RANGE"
-          }
-        ],
-        "projection": {
-          "projection_type": "ALL"
-        },
-        "provisioned_throughput": {
-          "read_capacity_units": 1,
-          "write_capacity_units": 1
-        }
-      }
     ],
     "autoscaling": []
   }

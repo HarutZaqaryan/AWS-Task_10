@@ -312,15 +312,16 @@ const createReservationHandler = async (event) => {
   // Check if the table exists
   const tableParams = {
     TableName: T_tables,
-    Key: {
-      id: eventObj.tableNumber,
+    KeyConditionExpression: "id = :tableNumber",
+    ExpressionAttributeValues: {
+      ":tableNumber": eventObj.tableNumber,
     },
   };
 
   try {
-    const tableData = await dynamoDb.get(tableParams).promise();
+    const tableData = await dynamoDb.query(tableParams).promise();
     console.log("~~~Table Data~~~", tableData);
-    if (!tableData.Item) {
+    if (!tableData.Items.length === 0) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Table does not exist" }),
@@ -330,7 +331,6 @@ const createReservationHandler = async (event) => {
     // Check for overlapping reservations
     const reservationParams = {
       TableName: T_reservations,
-      IndexName: "TableNumberDateIndex",
       KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
       ExpressionAttributeNames: {
         "#date": "date",
