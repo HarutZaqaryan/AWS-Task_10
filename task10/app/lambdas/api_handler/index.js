@@ -313,12 +313,13 @@ const createReservationHandler = async (event) => {
   const tableParams = {
     TableName: T_tables,
     Key: {
-      number: eventObj.tableNumber,
+      id: eventObj.tableNumber,
     },
   };
 
   try {
     const tableData = await dynamoDb.get(tableParams).promise();
+    console.log("~~~Table Data~~~", tableData);
     if (!tableData.Item) {
       return {
         statusCode: 400,
@@ -338,8 +339,11 @@ const createReservationHandler = async (event) => {
         ":date": eventObj.date,
       },
     };
+    console.log("~~~Reservation Params", reservationParams);
 
     const reservationData = await dynamoDb.query(reservationParams).promise();
+    console.log("~~~Reservation Date", reservationData);
+
     const reservations = reservationData.Items;
 
     for (const reservation of reservations) {
