@@ -306,7 +306,7 @@ const getTableByIdHandler = async (event) => {
   const params = {
     TableName: T_tables,
     Key: {
-      id: tableId,
+      id: +tableId,
     },
   };
   console.log("~~~tables id params~~~~", params);
