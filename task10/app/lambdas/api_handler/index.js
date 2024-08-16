@@ -45,7 +45,7 @@ export const handler = async (event) => {
     return await createReservationHandler(eventBody);
   } else if (path && path.startsWith("/tables/") && httpMethod === "GET") {
     console.log("~~~inside 6~~~~");
-    return await getTableByIdHandler(eventBody);
+    return await getTableByIdHandler(event);
   } else if (path === "/reservations" && httpMethod === "GET") {
     console.log("~~~inside 7~~~~");
     return await getReservationsHandler(eventBody);
@@ -301,7 +301,9 @@ const getTableByIdHandler = async (event) => {
   console.log("We in getTableByIdHandler, event is - ", event);
   const eventObj = JSON.parse(event);
 
-  const tableId = eventObj.resource.split("/")[2];
+  const tableId = eventObj.path.split("/")[2];
+  console.log("~~~table id from getidhandler",tableId);
+  
   const params = {
     TableName: T_tables,
     Key: {
