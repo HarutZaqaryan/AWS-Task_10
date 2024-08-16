@@ -245,6 +245,8 @@ const getTablesHandler = async (event) => {
     console.log("~~~We are in try block(getTableHandler)");
 
     const data = await dynamoDb.scan(params).promise();
+    console.log("~~~data from getTablesHandler", data);
+    
     return {
       statusCode: 200,
       body: JSON.stringify({ tables: data.Items }),
@@ -267,7 +269,7 @@ const createTableHandler = async (event) => {
   const params = {
     TableName: T_tables,
     Item: {
-      id: eventObj.id.toString() || uuidv4(),
+      id:eventObj.id.toString() || uuidv4(),
       number: eventObj.number,
       places: eventObj.places,
       isVip: eventObj.isVip,
@@ -314,7 +316,7 @@ const getTableByIdHandler = async (event) => {
     const data = await dynamoDb.get(params).promise();
     return {
       statusCode: 200,
-      body: JSON.stringify({data}),
+      body: JSON.stringify(data.Item),
     };
   } catch (error) {
     console.log("~~~We are in catch block(getbyhandler)", error.message);
@@ -349,7 +351,7 @@ const createReservationHandler = async (event) => {
   try {
     console.log("~~~We are in try block(createReserv)");
 
-    const data = await dynamoDb.put(params).promise();
+    await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ reservationId: params.Item.id }),
@@ -475,3 +477,4 @@ const getReservationsHandler = async (event) => {
 //   body: '{"firstName": "cmtr-954a4fcc-User", "lastName": "cmtr-954a4fcc-Validation", "email": "cmtr-954a4fcc-validation_user@test.com", "password": "p12345T-048_Gru"}',
 //   isBase64Encoded: false
 // }
+
