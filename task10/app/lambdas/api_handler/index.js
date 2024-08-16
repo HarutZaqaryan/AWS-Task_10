@@ -282,7 +282,7 @@ const createTableHandler = async (event) => {
     const data = await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
-      body: { id: +params.Item.id },
+      body: JSON.stringify({ id: +params.Item.id }),
     };
   } catch (error) {
     console.log("~~~We are in catch block(createTableHandler)", error.message);
