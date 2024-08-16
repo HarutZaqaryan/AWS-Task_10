@@ -369,7 +369,7 @@ const getTableByIdHandler = async (event) => {
 
 const createReservationHandler = async (event) => {
   console.log("We in createReservationHandler, event is - ", event);
-  const eventObj = JSON.parse(event);
+  const eventObj = JSON.parse(event.body);
 
   // Check if the table exists
   const tableParams = {
@@ -381,37 +381,64 @@ const createReservationHandler = async (event) => {
 
   const tableData = await dynamoDb.get(tableParams).promise();
   if (!tableData.Item) {
-    const params = {
-      TableName: T_reservations,
-      Item: {
-        id: uuidv4(),
-        tableNumber: eventObj.tableNumber,
-        clientName: eventObj.clientName,
-        phoneNumber: eventObj.phoneNumber,
-        date: eventObj.date,
-        slotTimeStart: eventObj.slotTimeStart,
-        slotTimeEnd: eventObj.slotTimeEnd,
-      },
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Table does not exist" }),
     };
+  }
 
-    console.log("~~~reservations post params~~~~", params);
+  // Check for overlapping reservations
+  const reservationParams = {
+    TableName: T_reservations,
+    FilterExpression: "tableNumber = :tableNumber AND date = :date AND ((slotTimeStart <= :slotTimeEnd AND slotTimeEnd >= :slotTimeStart))",
+    ExpressionAttributeValues: {
+      ":tableNumber": eventObj.tableNumber,
+      ":date": eventObj.date,
+      ":slotTimeStart": eventObj.slotTimeStart,
+      ":slotTimeEnd": eventObj.slotTimeEnd,
+    },
+  };
 
-    try {
-      await dynamoDb.put(params).promise();
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ reservationId: params.Item.id }),
-      };
-    } catch (error) {
-      console.log("~~~We are in catch block(createReserv)", error.message);
+  const reservationData = await dynamoDb.scan(reservationParams).promise();
+  if (reservationData.Items.length > 0) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Reservation overlaps with an existing reservation" }),
+    };
+  }
 
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: error.message }),
-      };
-    }
+  // Add the reservation
+  const params = {
+    TableName: T_reservations,
+    Item: {
+      id: uuidv4(),
+      tableNumber: eventObj.tableNumber,
+      clientName: eventObj.clientName,
+      phoneNumber: eventObj.phoneNumber,
+      date: eventObj.date,
+      slotTimeStart: eventObj.slotTimeStart,
+      slotTimeEnd: eventObj.slotTimeEnd,
+    },
+  };
+
+  console.log("~~~reservations post params~~~~", params);
+
+  try {
+    await dynamoDb.put(params).promise();
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ reservationId: params.Item.id }),
+    };
+  } catch (error) {
+    console.log("~~~We are in catch block(createReserv)", error.message);
+
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: error.message }),
+    };
   }
 };
+
 
 // /reservations GET
 const getReservationsHandler = async (event) => {
