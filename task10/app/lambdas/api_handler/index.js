@@ -330,6 +330,7 @@ const createReservationHandler = async (event) => {
     // Check for overlapping reservations
     const reservationParams = {
       TableName: T_reservations,
+      IndexName: "TableNumberDateIndex",
       KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
       ExpressionAttributeNames: {
         "#date": "date",
