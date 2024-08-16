@@ -5,25 +5,16 @@ const cognito = new AWS.CognitoIdentityServiceProvider();
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const T_tables = process.env.tables_table || "Tables000";
-console.log("~~~T_tables~~~~", T_tables);
 const T_reservations = process.env.reservations_table || "Reservations000";
-console.log("~~~T_reservations~~~~", T_reservations);
-const userPoolName =
-  process.env.booking_userpool || "simple-booking-userpool000";
-console.log("~~~user_pool_id~~~~", userPoolName);
+const userPoolName = process.env.booking_userpool || "simple-booking-userpool000";
 let userPoolID;
 let userClientID;
-// const clientId = process.env.booking_client_id || "your-client-id000";
-// console.log("~~~clientID~~~~", clientId);
 
 export const handler = async (event) => {
   console.log("~~~EVENT~~~~", event);
 
   const httpMethod = event.httpMethod;
-  console.log("~~~httpMethod~~~~", httpMethod);
-
   const path = event.path;
-  console.log("~~~path~~~~", path);
 
   const eventBody = event.body;
   console.log("~~~event body~~~~", eventBody);
@@ -64,8 +55,6 @@ const getuserPoolNameByName = async (userPoolName) => {
       MaxResults: 60,
     };
     const response = await cognito.listUserPools(params).promise();
-    // console.log("~~~Response from getuserPoolNamebyName", response);
-
     const userPool = response.UserPools.find(
       (pool) => pool.Name === userPoolName
     );
@@ -85,14 +74,11 @@ const getClientId = async () => {
   try {
     const params = {
       UserPoolId: userPoolID,
-      MaxResults: 60, // Adjust this if you expect more clients
+      MaxResults: 60,
     };
 
     const response = await cognito.listUserPoolClients(params).promise();
-    // console.log("Client List Response:", response);
-
-    // Assuming you want the first client or based on some criteria
-    const client = response.UserPoolClients[0]; // Change this if needed
+    const client = response.UserPoolClients[0];
 
     if (client) {
       return client.ClientId;
@@ -107,14 +93,7 @@ const getClientId = async () => {
 
 // /signup POST
 const signupHandler = async (event) => {
-  // console.log("We are in signupHandler, event is - ", event);
   const eventObj = JSON.parse(event);
-  // console.log("We are in signupHandler, event obj(parsed) - ", eventObj);
-  // console.log(
-  //   "We are in signupHandler, event obj(parsed) type is - ",
-  //   typeof eventObj
-  // );
-
   if (!userPoolID) {
     userPoolID = await getuserPoolNameByName(userPoolName);
   }
@@ -131,10 +110,7 @@ const signupHandler = async (event) => {
     TemporaryPassword: eventObj.password,
   };
 
-  // console.log("~~~signup params~~~~", params);
-
   try {
-    // console.log("We are in try block(signupHandler)");
     const req = await cognito.adminCreateUser(params).promise();
     return {
       statusCode: 200,
@@ -151,42 +127,28 @@ const signupHandler = async (event) => {
 
 // /signin POST
 const signinHandler = async (event) => {
-  // console.log("We in signinHandler, event is - ", event);
   const eventObj = JSON.parse(event);
 
   if (!userClientID) {
     userClientID = await getClientId();
   }
-
   if (!userPoolID) {
     userPoolID = await getuserPoolNameByName(userPoolName);
   }
 
   const params = {
     AuthFlow: "USER_PASSWORD_AUTH",
-    // AuthFlow: "ADMIN_NO_SRP_AUTH",
-    // ClientId: clientId,
     ClientId: userClientID,
     AuthParameters: {
       USERNAME: eventObj.email,
       PASSWORD: eventObj.password,
     },
   };
-  // console.log("~~~signin params~~~~", params);
 
   try {
-    // console.log("We are in try block(signinHandler)");
-
     const response = await cognito.initiateAuth(params).promise();
-    // console.log("~~~response from signinhandler", response);
-    // const response = await cognito.adminInitiateAuth(params).promise();
-    // console.log("~~~response from signinhandler",response);
-
-    // const idToken = response.AuthenticationResult.IdToken;
-    // return idToken;
     if (response.ChallengeName === "NEW_PASSWORD_REQUIRED") {
-      // Handle the new password required challenge
-      const newPassword = eventObj.password; // Get the new password from the event or another source
+      const newPassword = eventObj.password;
 
       const challengeResponses = {
         USERNAME: eventObj.email,
@@ -203,11 +165,6 @@ const signinHandler = async (event) => {
       const challengeResponse = await cognito
         .respondToAuthChallenge(challengeParams)
         .promise();
-      // console.log(
-      //   "~~~challenge response from signinhandler",
-      //   challengeResponse
-      // );
-
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -234,19 +191,13 @@ const signinHandler = async (event) => {
 
 // /tables GET
 const getTablesHandler = async (event) => {
-  // console.log("We in getTablesHandler, event is - ", event);
 
   const params = {
     TableName: T_tables,
   };
-  // console.log("~~~tables get params~~~~", params);
-
   try {
-    // console.log("~~~We are in try block(getTableHandler)");
 
     const data = await dynamoDb.scan(params).promise();
-    // console.log("~~~data from getTablesHandler", data);
-
     return {
       statusCode: 200,
       body: JSON.stringify({ tables: data.Items }),
@@ -263,7 +214,6 @@ const getTablesHandler = async (event) => {
 
 // /tables POST
 const createTableHandler = async (event) => {
-  // console.log("We are in createTableHandler, event is - ", event);
   const eventObj = JSON.parse(event);
 
   const params = {
@@ -276,11 +226,8 @@ const createTableHandler = async (event) => {
       minOrder: eventObj.minOrder,
     },
   };
-  // console.log("~~~tables post params~~~~", params);
 
   try {
-    // console.log("~~~We are in try block(createTableHandler)");
-
     const data = await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
@@ -288,7 +235,6 @@ const createTableHandler = async (event) => {
     };
   } catch (error) {
     console.log("~~~We are in catch block(createTableHandler)", error.message);
-
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -298,22 +244,15 @@ const createTableHandler = async (event) => {
 
 // /tables/{tableId} GET
 const getTableByIdHandler = async (event) => {
-  // console.log("We in getTableByIdHandler, event is - ", event);
-
   const tableId = event.path.split("/")[2];
-  // console.log("~~~table id from getidhandler",tableId);
-
   const params = {
     TableName: T_tables,
     Key: {
       id: +tableId,
     },
   };
-  // console.log("~~~tables id params~~~~", params);
 
   try {
-    // console.log("~~~We are in try block(getTableByHandler)");
-
     const data = await dynamoDb.get(params).promise();
     return {
       statusCode: 200,
@@ -321,7 +260,6 @@ const getTableByIdHandler = async (event) => {
     };
   } catch (error) {
     console.log("~~~We are in catch block(getbyhandler)", error.message);
-
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -329,44 +267,122 @@ const getTableByIdHandler = async (event) => {
   }
 };
 
-// /reservations POST
+// /reservations POST (my code)
+// const createReservationHandler = async (event) => {
+//   console.log("We in createReservationHandler, event is - ", event);
+//   const eventObj = JSON.parse(event);
+
+//   const params = {
+//     TableName: T_reservations,
+//     Item: {
+//       id: uuidv4(),
+//       tableNumber: eventObj.tableNumber,
+//       clientName: eventObj.clientName,
+//       phoneNumber: eventObj.phoneNumber,
+//       date: eventObj.date,
+//       slotTimeStart: eventObj.slotTimeStart,
+//       slotTimeEnd: eventObj.slotTimeEnd,
+//     },
+//   };
+//   console.log("~~~reservations post params~~~~", params);
+
+//   try {
+//     console.log("~~~We are in try block(createReserv)");
+
+//     await dynamoDb.put(params).promise();
+//     return {
+//       statusCode: 200,
+//       body: JSON.stringify({ reservationId: params.Item.id }),
+//     };
+//   } catch (error) {
+//     console.log("~~~We are in catch block(createReserv)", error.message);
+
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({ message: error.message }),
+//     };
+//   }
+// };
+
+// Copilot code
 const createReservationHandler = async (event) => {
   console.log("We in createReservationHandler, event is - ", event);
   const eventObj = JSON.parse(event);
 
-  const params = {
-    TableName: T_reservations,
-    Item: {
-      id: uuidv4(),
-      // reservationId: uuidv4(),
-      tableNumber: eventObj.tableNumber,
-      clientName: eventObj.clientName,
-      phoneNumber: eventObj.phoneNumber,
-      date: eventObj.date,
-      slotTimeStart: eventObj.slotTimeStart,
-      slotTimeEnd: eventObj.slotTimeEnd,
+  // Check if the table exists
+  const tableParams = {
+    TableName: T_tables,
+    Key: {
+      number: eventObj.tableNumber,
     },
   };
-  console.log("~~~reservations post params~~~~", params);
 
   try {
-    console.log("~~~We are in try block(createReserv)");
+    const tableData = await dynamoDb.get(tableParams).promise();
+    if (!tableData.Item) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Table does not exist" }),
+      };
+    }
+
+    // Check for overlapping reservations
+    const reservationParams = {
+      TableName: T_reservations,
+      KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
+      ExpressionAttributeNames: {
+        "#date": "date",
+      },
+      ExpressionAttributeValues: {
+        ":tableNumber": eventObj.tableNumber,
+        ":date": eventObj.date,
+      },
+    };
+
+    const reservationData = await dynamoDb.query(reservationParams).promise();
+    const reservations = reservationData.Items;
+
+    for (const reservation of reservations) {
+      if (
+        eventObj.slotTimeStart < reservation.slotTimeEnd &&
+        eventObj.slotTimeEnd > reservation.slotTimeStart
+      ) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({
+            message: "Reservation time overlaps with an existing reservation",
+          }),
+        };
+      }
+    }
+
+    // Create the reservation
+    const params = {
+      TableName: T_reservations,
+      Item: {
+        id: uuidv4(),
+        tableNumber: eventObj.tableNumber,
+        clientName: eventObj.clientName,
+        phoneNumber: eventObj.phoneNumber,
+        date: eventObj.date,
+        slotTimeStart: eventObj.slotTimeStart,
+        slotTimeEnd: eventObj.slotTimeEnd,
+      },
+    };
 
     await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ reservationId: params.Item.id }),
     };
-  } catch (error) {
+  }  catch (error) {
     console.log("~~~We are in catch block(createReserv)", error.message);
-
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
     };
   }
 };
-
 
 // /reservations GET
 const getReservationsHandler = async (event) => {
