@@ -242,13 +242,15 @@ const getTablesHandler = async (event) => {
   console.log("~~~tables get params~~~~", params);
 
   try {
+    console.log("~~~We are in try block(getTableHandler)");
+
     const data = await dynamoDb.scan(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ tables: data.Items }),
     };
   } catch (error) {
-    console.log("getTablesHandler catch block", errpr.message);
+    console.log("getTablesHandler catch block", error.message);
 
     return {
       statusCode: 400,
@@ -275,12 +277,16 @@ const createTableHandler = async (event) => {
   console.log("~~~tables post params~~~~", params);
 
   try {
-    await dynamoDb.put(params).promise();
+    console.log("~~~We are in try block(createTableHandler)");
+    
+    const data = await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ id: params.Item.id }),
     };
   } catch (error) {
+    console.log("~~~We are in catch block(createTableHandler)",error.message);
+
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -303,12 +309,16 @@ const getTableByIdHandler = async (event) => {
   console.log("~~~tables id params~~~~", params);
 
   try {
+    console.log("~~~We are in try block(getTableByHandler)");
+
     const data = await dynamoDb.get(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify(data.Item),
     };
   } catch (error) {
+    console.log("~~~We are in catch block(getbyhandler)",error.message);
+
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -336,12 +346,16 @@ const createReservationHandler = async (event) => {
   console.log("~~~reservations post params~~~~", params);
 
   try {
+    console.log("~~~We are in try block(createReserv)");
+
     await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ reservationId: params.Item.reservationId }),
     };
   } catch (error) {
+    console.log("~~~We are in catch block(createReserv)",error.message);
+
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -359,12 +373,16 @@ const getReservationsHandler = async (event) => {
   console.log("~~~reservations get params~~~~", params);
 
   try {
+    console.log("~~~We are in try block(getReserv)");
+
     const data = await dynamoDb.scan(params).promise();
     return {
       statusCode: 200,
       body: JSON.stringify({ reservations: data.Items }),
     };
   } catch (error) {
+    console.log("~~~We are in catch block(getReserv)",error.message);
+
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
