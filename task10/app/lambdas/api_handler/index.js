@@ -300,13 +300,13 @@ export const createReservationHandler = async (event) => {
       };
     } else {
       console.log("~~~ else of !tableExists~~~");
-      console.log("reservationIntersects", await reservationIntersects());
-
       const reserveTableParams = {
         TableName: T_reservations,
       };
       const reservData = await dynamoDb.scan(reserveTableParams).promise();
 
+      console.log("~~~resIntercests~~~",reservationIntersects(eventObj,reservData));
+      
       if (reservationIntersects(eventObj, reservData)) {
         return {
           statusCode: 400,
