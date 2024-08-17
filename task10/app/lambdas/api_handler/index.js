@@ -349,7 +349,7 @@ export const createReservationHandler = async (event) => {
   const tableParams = {
     TableName: T_reservations,
     Key: {
-      id: eventObj.tableNumber,
+      id: eventObj.tableNumber.toString(),
     },
   };
   console.log("~~~tableParams", tableParams);
