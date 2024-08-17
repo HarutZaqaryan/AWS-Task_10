@@ -347,7 +347,7 @@ export const createReservationHandler = async (event) => {
 
   // Check if the table exists
   const tableParams = {
-    TableName: T_reservations,
+    TableName: T_tables,
   };
   console.log("~~~tableParams", tableParams);
 
@@ -356,7 +356,13 @@ export const createReservationHandler = async (event) => {
     const tableData = await dynamoDb.scan(tableParams).promise();
     console.log("~~~tableData", tableData);
 
-      // const params = {
+    for (const item of tableData.Items) {
+      if (tableNumber === item.number) {
+        console.log("~~~ITEM~~~",item);
+      }
+    }
+
+    // const params = {
       //   TableName: T_reservations,
       //   Item: {
       //     id: uuidv4(),
@@ -376,42 +382,6 @@ export const createReservationHandler = async (event) => {
       //   statusCode: 200,
       //   body: JSON.stringify({ reservationId: params.Item.id }),
       // };
-
-    // Check for overlapping reservations
-    // const reservationParams = {
-    //   TableName: T_reservations,
-    //   KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
-    //   ExpressionAttributeNames: {
-    //     "#date": "date",
-    //   },
-    //   ExpressionAttributeValues: {
-    //     ":tableNumber": eventObj.tableNumber,
-    //     ":date": eventObj.date,
-    //   },
-    // };
-    // console.log("~~~reservationParams~~~", eventObj);
-
-    // const reservationData = await dynamoDb.query(reservationParams).promise();
-    // console.log("~~~reservationData~~~", reservationData);
-
-    // const reservations = reservationData.Items;
-    // console.log("~~~reservation items~~~", reservations);
-
-    // for (const reservation of reservations) {
-    //   if (
-    //     eventObj.slotTimeStart < reservation.slotTimeEnd &&
-    //     eventObj.slotTimeEnd > reservation.slotTimeStart
-    //   ) {
-    //     return {
-    //       statusCode: 400,
-    //       body: JSON.stringify({
-    //         message: "Reservation time overlaps with an existing reservation",
-    //       }),
-    //     };
-    //   }
-    // }
-
-    // Create the reservation
 
   } catch (error) {
     console.log("Error in createReservationHandler:", error.message);
