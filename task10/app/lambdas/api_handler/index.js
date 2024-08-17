@@ -300,15 +300,20 @@ export const createReservationHandler = async (event) => {
       };
     } else {
       console.log("~~~ else of !tableExists~~~");
-      console.log("reservationIntersects",await reservationIntersects());
-      
-      if (await reservationIntersects(eventObj)) {
+      console.log("reservationIntersects", await reservationIntersects());
+
+      const reserveTableParams = {
+        TableName: T_reservations,
+      };
+      const reservData = await dynamoDb.scan(reserveTableParams).promise();
+
+      if (reservationIntersects(eventObj, reservData)) {
         return {
           statusCode: 400,
           body: JSON.stringify({ message: "Reservation already exists" }),
         };
       }
-      
+
       const params = {
         TableName: T_reservations,
         Item: {
@@ -337,29 +342,21 @@ export const createReservationHandler = async (event) => {
   }
 };
 
-const reservationIntersects = async (e) => {
-  console.log("~~~event in resIntersects~~~",e);
-  
-  const reserveTableParams = {
-    TableName: T_reservations,
-  };
-  const reservData = await dynamoDb.scan(reserveTableParams).promise();
+function reservationIntersects(event, data) {
+  console.log("~~~event in resIntersects~~~", event);
+
+  const reservData = data;
   console.log("~~~Reservedata~~~", reservData);
   for (let i = 0; i < reservData.Items.length; i++) {
     const r_item = reservData.Items[i];
-    if (
-      e.tableNumber === r_item.number &&
-      e.date == r_item.date
-    ) {
+    if (event.tableNumber === r_item.number && event.date == r_item.date) {
       resStart = r_item.slotTimeStart;
       resEnd = r_item.slotTimeend;
-      return (
-        e.slotTimeStart <= resEnd && e.slotTimeEnd >= resStart
-      );
+      return event.slotTimeStart <= resEnd && event.slotTimeEnd >= resStart;
     }
   }
   return false;
-};
+}
 
 const getReservationsHandler = async (event) => {
   console.log("We in getReservationsHandler, event is - ", event);
