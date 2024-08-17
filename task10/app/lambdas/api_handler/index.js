@@ -298,48 +298,34 @@ export const createReservationHandler = async (event) => {
         statusCode: 400,
         body: JSON.stringify({ message: "Table is not exist" }),
       };
-    } else { 
+    } else {
       console.log("~~~ else of !tableExists~~~");
-      const reserveTableParams = {
-        TableName: T_reservations,
-      };
-      const reservData = await dynamoDb.scan(reserveTableParams).promise();
-      console.log("~~~Reservedata~~~",reservData);
-      for (let i = 0; i < reservData.Items.length; i++) {
-        const r_item = reservData.Items[i];
-        if (
-          eventObj.tableNumber === r_item.number &&
-          eventObj.date == r_item.date
-        ) {
-          resStart = r_item.slotTimeStart;
-          resEnd = r_item.slotTimeend;
-          if (eventObj.slotTimeStart <= resEnd && eventObj.slotTimeEnd >= resStart) {
-            return {
-              statusCode: 400,
-              body: JSON.stringify({ message: "Reservation already exists" }),
-            };
-          } else {
-            const params = {
-              TableName: T_reservations,
-              Item: {
-                id: uuidv4(),
-                tableNumber: eventObj.tableNumber,
-                clientName: eventObj.clientName,
-                phoneNumber: eventObj.phoneNumber,
-                date: eventObj.date,
-                slotTimeStart: eventObj.slotTimeStart,
-                slotTimeEnd: eventObj.slotTimeEnd,
-              },
-            };
-            await dynamoDb.put(params).promise();
-
-            return {
-              statusCode: 200,
-              body: JSON.stringify({ reservationId: params.Item.id }),
-            };
-          }
-        }
+      console.log("reservationIntersects",await reservationIntersects());
+      
+      if (await reservationIntersects()) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ message: "Reservation already exists" }),
+        };
       }
+      const params = {
+        TableName: T_reservations,
+        Item: {
+          id: uuidv4(),
+          tableNumber: eventObj.tableNumber,
+          clientName: eventObj.clientName,
+          phoneNumber: eventObj.phoneNumber,
+          date: eventObj.date,
+          slotTimeStart: eventObj.slotTimeStart,
+          slotTimeEnd: eventObj.slotTimeEnd,
+        },
+      };
+      await dynamoDb.put(params).promise();
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ reservationId: params.Item.id }),
+      };
     }
   } catch (error) {
     console.log("Error in createReservationHandler catch:", error.message);
@@ -348,6 +334,28 @@ export const createReservationHandler = async (event) => {
       body: JSON.stringify({ message: error.message }),
     };
   }
+};
+
+const reservationIntersects = async () => {
+  const reserveTableParams = {
+    TableName: T_reservations,
+  };
+  const reservData = await dynamoDb.scan(reserveTableParams).promise();
+  console.log("~~~Reservedata~~~", reservData);
+  for (let i = 0; i < reservData.Items.length; i++) {
+    const r_item = reservData.Items[i];
+    if (
+      eventObj.tableNumber === r_item.number &&
+      eventObj.date == r_item.date
+    ) {
+      resStart = r_item.slotTimeStart;
+      resEnd = r_item.slotTimeend;
+      return (
+        eventObj.slotTimeStart <= resEnd && eventObj.slotTimeEnd >= resStart
+      );
+    }
+  }
+  return false;
 };
 
 const getReservationsHandler = async (event) => {
