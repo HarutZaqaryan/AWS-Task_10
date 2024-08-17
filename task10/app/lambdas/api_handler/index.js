@@ -353,11 +353,14 @@ export const createReservationHandler = async (event) => {
     const tableData = await dynamoDb.scan(tableParams).promise();
     console.log("~~~tableData", tableData);
 
-    for (const item of tableData.Items) {
-      if (eventObj.tableNumber === item.number) {
-        console.log("~~~ITEM~~~", item);
-        
+    function parseTime(time) {
+      const [hours, minutes] = time.split(":").map(Number);
+      return new Date(0, 0, 0, hours, minutes);
+    }
 
+    for (let i = 0; i < tableData.Items.length; i++) {
+      const t_item = tableData.Items[i];
+      if (eventObj.tableNumber === t_item.number) {
         const reserveTable = {
           TableName: T_reservations,
         };
@@ -365,51 +368,48 @@ export const createReservationHandler = async (event) => {
         const reservData = await dynamoDb.scan(reserveTable).promise();
         console.log("~~~reservData~~~", reservData);
 
-        for(const r_item of reservData.Items) {
-          console.log("~~~r_item~~~",r_item);    
+        for (let i = 0; i < reservData.Items.length; i++)  {
+          const r_item = tableData.Items[i];
+          console.log("~~~r_item~~~", r_item);
+          // if (
+          //   !(
+          //     parseTime(eventObj.slotTimeStart) <
+          //       parseTime(existingSlotTimeEnd) &&
+          //     parseTime(eventObj.slotTimeEnd) > parseTime(existingSlotTimeStart)
+          //   )
+          // ) {
+          //   const params = {
+          //     TableName: T_reservations,
+          //     Item: {
+          //       id: uuidv4(),
+          //       tableNumber: eventObj.tableNumber,
+          //       clientName: eventObj.clientName,
+          //       phoneNumber: eventObj.phoneNumber,
+          //       date: eventObj.date,
+          //       slotTimeStart: eventObj.slotTimeStart,
+          //       slotTimeEnd: eventObj.slotTimeEnd,
+          //     },
+          //   };
+          //   await dynamoDb.put(params).promise();
+
+          //   return {
+          //     statusCode: 200,
+          //     body: JSON.stringify({ reservationId: params.Item.id }),
+          //   };
+          // } else {
+          //   return {
+          //     statusCode: 400,
+          //     body: JSON.stringify({ message: "Reservation already exist" }),
+          //   };
+          // }
         }
-
-
-        // function parseTime(time) {
-        //   const [hours, minutes] = time.split(":").map(Number);
-        //   return new Date(0, 0, 0, hours, minutes);
-        // }
-
-        // if (
-        //   !(parseTime(eventObj.slotTimeStart) < parseTime(existingSlotTimeEnd) &&
-        //   parseTime(eventObj.slotTimeEnd) > parseTime(existingSlotTimeStart))
-        // ) {
-        //   const params = {
-        //     TableName: T_reservations,
-        //     Item: {
-        //       id: uuidv4(),
-        //       tableNumber: eventObj.tableNumber,
-        //       clientName: eventObj.clientName,
-        //       phoneNumber: eventObj.phoneNumber,
-        //       date: eventObj.date,
-        //       slotTimeStart: eventObj.slotTimeStart,
-        //       slotTimeEnd: eventObj.slotTimeEnd,
-        //     },
-        //   };
-        //   await dynamoDb.put(params).promise();
-
-        //   return {
-        //     statusCode: 200,
-        //     body: JSON.stringify({ reservationId: params.Item.id }),
-        //   };
-        // } else {
-        //   return {
-        //     statusCode: 400,
-        //     body: JSON.stringify({ message: "Reservation already exist" }),
-        //   };
-        // }
+        continue;
+      } else {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ message: "Table is not exist" }),
+        };
       }
-      //  else {
-      //   return {
-      //     statusCode: 400,
-      //     body: JSON.stringify({ message: "Table is not exist" }),
-      //   };
-      // }
     }
   } catch (error) {
     console.log("Error in createReservationHandler:", error.message);
