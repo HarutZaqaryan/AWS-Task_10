@@ -293,15 +293,18 @@ export const createReservationHandler = async (event) => {
     }
 
     if (!tableExists) {
+      console.log("~~~!tableExists~~~");
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Table is not exist" }),
       };
-    } else {
+    } else { 
+      console.log("~~~ else of !tableExists~~~");
       const reserveTableParams = {
         TableName: T_reservations,
       };
       const reservData = await dynamoDb.scan(reserveTableParams).promise();
+      console.log("~~~Reservedata~~~",reservData);
       for (let i = 0; i < reservData.Items.length; i++) {
         const r_item = reservData.Items[i];
         if (
