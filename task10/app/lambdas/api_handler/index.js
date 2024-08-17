@@ -300,38 +300,15 @@ export const createReservationHandler = async (event) => {
       };
     } else {
       console.log("~~~ else of !tableExists~~~");
-      console.log("reservationIntersects", await reservationIntersects());
-
-      const reservationIntersects = async () => {
-        const reserveTableParams = {
-          TableName: T_reservations,
-        };
-        const reservData = await dynamoDb.scan(reserveTableParams).promise();
-        console.log("~~~Reservedata~~~", reservData);
-        for (let i = 0; i < reservData.Items.length; i++) {
-          const r_item = reservData.Items[i];
-          if (
-            eventObj.tableNumber === r_item.number &&
-            eventObj.date == r_item.date
-          ) {
-            resStart = r_item.slotTimeStart;
-            resEnd = r_item.slotTimeend;
-            return (
-              eventObj.slotTimeStart <= resEnd &&
-              eventObj.slotTimeEnd >= resStart
-            );
-          }
-        }
-        return false;
-      };
+      console.log("reservationIntersects",await reservationIntersects());
       
-      if (await reservationIntersects()) {
+      if (await reservationIntersects(eventObj)) {
         return {
           statusCode: 400,
           body: JSON.stringify({ message: "Reservation already exists" }),
         };
       }
-
+      
       const params = {
         TableName: T_reservations,
         Item: {
@@ -358,6 +335,28 @@ export const createReservationHandler = async (event) => {
       body: JSON.stringify({ message: error.message }),
     };
   }
+};
+
+const reservationIntersects = async (e) => {
+  const reserveTableParams = {
+    TableName: T_reservations,
+  };
+  const reservData = await dynamoDb.scan(reserveTableParams).promise();
+  console.log("~~~Reservedata~~~", reservData);
+  for (let i = 0; i < reservData.Items.length; i++) {
+    const r_item = reservData.Items[i];
+    if (
+      e.tableNumber === r_item.number &&
+      e.date == r_item.date
+    ) {
+      resStart = r_item.slotTimeStart;
+      resEnd = r_item.slotTimeend;
+      return (
+        e.slotTimeStart <= resEnd && e.slotTimeEnd >= resStart
+      );
+    }
+  }
+  return false;
 };
 
 const getReservationsHandler = async (event) => {
