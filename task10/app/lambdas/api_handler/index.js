@@ -350,6 +350,8 @@ export const createReservationHandler = async (event) => {
   };
 
   try {
+    console.log("~~~We are in createReservations TRY block");
+    
     const tableData = await dynamoDb.scan(tableParams).promise();
     console.log("~~~tableData", tableData);
 
@@ -361,16 +363,20 @@ export const createReservationHandler = async (event) => {
     for (let i = 0; i < tableData.Items.length; i++) {
       const t_item = tableData.Items[i];
       if (eventObj.tableNumber === t_item.number) {
-        const reserveTable = {
+        console.log("~~~t_item~~~",t_item);
+        
+        const reserveTableParams = {
           TableName: T_reservations,
         };
 
-        const reservData = await dynamoDb.scan(reserveTable).promise();
+        const reservData = await dynamoDb.scan(reserveTableParams).promise();
         console.log("~~~reservData~~~", reservData);
 
-        for (let i = 0; i < reservData.Items.length; i++)  {
-          const r_item = tableData.Items[i];
-          console.log("~~~r_item~~~", r_item);
+        // for (let i = 0; i < reservData.Items.length; i++)  {
+        //   const r_item = tableData.Items[i];
+        //   console.log("~~~r_item~~~", r_item);
+
+
           // if (
           //   !(
           //     parseTime(eventObj.slotTimeStart) <
@@ -402,7 +408,9 @@ export const createReservationHandler = async (event) => {
           //     body: JSON.stringify({ message: "Reservation already exist" }),
           //   };
           // }
-        }
+
+
+        // }
         continue;
       } else {
         return {
@@ -412,6 +420,8 @@ export const createReservationHandler = async (event) => {
       }
     }
   } catch (error) {
+    console.log("~~~We are in createReservations TRY block");
+
     console.log("Error in createReservationHandler:", error.message);
     return {
       statusCode: 400,
