@@ -6,7 +6,8 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const T_tables = process.env.tables_table || "Tables000";
 const T_reservations = process.env.reservations_table || "Reservations000";
-const userPoolName = process.env.booking_userpool || "simple-booking-userpool000";
+const userPoolName =
+  process.env.booking_userpool || "simple-booking-userpool000";
 let userPoolID;
 let userClientID;
 
@@ -191,12 +192,10 @@ const signinHandler = async (event) => {
 
 // /tables GET
 const getTablesHandler = async (event) => {
-
   const params = {
     TableName: T_tables,
   };
   try {
-
     const data = await dynamoDb.scan(params).promise();
     return {
       statusCode: 200,
@@ -304,61 +303,102 @@ const getTableByIdHandler = async (event) => {
 //   }
 // };
 
-// Copilot code
-const createReservationHandler = async (event) => {
-  console.log("We in createReservationHandler, event is - ", event);
-  const eventObj = JSON.parse(event);
+//! Copilot code
+// const createReservationHandler = async (event) => {
+//   console.log("We in createReservationHandler, event is - ", event);
+//   const eventObj = JSON.parse(event);
+
+//   try {
+//     // Create the reservation
+//     const params = {
+//       TableName: T_reservations,
+//       Item: {
+//         id: uuidv4(),
+//         tableNumber: eventObj.tableNumber,
+//         clientName: eventObj.clientName,
+//         phoneNumber: eventObj.phoneNumber,
+//         date: eventObj.date,
+//         slotTimeStart: eventObj.slotTimeStart,
+//         slotTimeEnd: eventObj.slotTimeEnd,
+//       },
+//     };
+
+//    const data = await dynamoDb.put(params).promise();
+//     return {
+//       statusCode: 200,
+//       body: JSON.stringify({ reservationId: params.Item.id }),
+//     };
+//   }  catch (error) {
+//     console.log("~~~We are in catch block(createReserv)", error.message);
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({ message: error.message }),
+//     };
+//   }
+// };
+
+// /reservations GET
+
+// !GPT code
+export const createReservationHandler = async (event) => {
+  console.log("We are in createReservationHandler, event is - ", event);
+  const eventObj = JSON.parse(event.body);
+  console.log("~~~eventObj (event body parsed)", eventObj);
 
   // Check if the table exists
-  // const tableParams = {
-  //   TableName: T_tables,
-  //   Key: {
-  //     id: eventObj.tableNumber,
-  //   },
-  // };
+  const tableParams = {
+    TableName: T_reservations,
+    Key: {
+      id: eventObj.tableNumber,
+    },
+  };
+  console.log("~~~tableParams", tableParams);
 
   try {
-    // const tableData = await dynamoDb.get(tableParams).promise();
-    // console.log("~~~Table Data~~~", tableData);
-    // if (!tableData.Item) {
-    //   return {
-    //     statusCode: 200,
-    //     body: JSON.stringify({ message: "Table does not exist" }),
-    //   };
-    // }
+    // Validate table existence
+    const tableData = await dynamoDb.get(tableParams).promise();
+    console.log("~~~tableData", tableData);
 
-    // // Check for overlapping reservations
-    // const reservationParams = {
-    //   TableName: T_reservations,
-    //   KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
-    //   ExpressionAttributeNames: {
-    //     "#date": "date",
-    //   },
-    //   ExpressionAttributeValues: {
-    //     ":tableNumber": eventObj.tableNumber,
-    //     ":date": eventObj.date,
-    //   },
-    // };
-    // console.log("~~~Reservation Params", reservationParams);
+    if (!tableData.Item) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Table does not exist" }),
+      };
+    }
 
-    // const reservationData = await dynamoDb.query(reservationParams).promise();
-    // console.log("~~~Reservation Date", reservationData);
+    // Check for overlapping reservations
+    const reservationParams = {
+      TableName: T_reservations,
+      KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
+      ExpressionAttributeNames: {
+        "#date": "date",
+      },
+      ExpressionAttributeValues: {
+        ":tableNumber": eventObj.tableNumber,
+        ":date": eventObj.date,
+      },
+    };
+    console.log("~~~reservationParams~~~", eventObj);
 
-    // const reservations = reservationData.Items;
+    const reservationData = await dynamoDb.query(reservationParams).promise();
+    console.log("~~~reservationData~~~", reservationData);
 
-    // for (const reservation of reservations) {
-    //   if (
-    //     eventObj.slotTimeStart < reservation.slotTimeEnd &&
-    //     eventObj.slotTimeEnd > reservation.slotTimeStart
-    //   ) {
-    //     return {
-    //       statusCode: 400,
-    //       body: JSON.stringify({
-    //         message: "Reservation time overlaps with an existing reservation",
-    //       }),
-    //     };
-    //   }
-    // }
+    const reservations = reservationData.Items;
+    console.log("~~~reservation items~~~", reservations);
+
+    for (const reservation of reservations) {
+      if (
+        eventObj.slotTimeStart < reservation.slotTimeEnd &&
+        eventObj.slotTimeEnd > reservation.slotTimeStart
+      ) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({
+            message: "Reservation time overlaps with an existing reservation",
+          }),
+        };
+      }
+    }
 
     // Create the reservation
     const params = {
@@ -373,14 +413,16 @@ const createReservationHandler = async (event) => {
         slotTimeEnd: eventObj.slotTimeEnd,
       },
     };
+    console.log("~~~paras~~~", params);
 
-   const data = await dynamoDb.put(params).promise();
+    await dynamoDb.put(params).promise();
+
     return {
       statusCode: 200,
       body: JSON.stringify({ reservationId: params.Item.id }),
     };
-  }  catch (error) {
-    console.log("~~~We are in catch block(createReserv)", error.message);
+  } catch (error) {
+    console.log("Error in createReservationHandler:", error.message);
     return {
       statusCode: 400,
       body: JSON.stringify({ message: error.message }),
@@ -388,7 +430,6 @@ const createReservationHandler = async (event) => {
   }
 };
 
-// /reservations GET
 const getReservationsHandler = async (event) => {
   console.log("We in getReservationsHandler, event is - ", event);
 
