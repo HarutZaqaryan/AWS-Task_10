@@ -342,7 +342,7 @@ const getTableByIdHandler = async (event) => {
 // !GPT code
 export const createReservationHandler = async (event) => {
   console.log("We are in createReservationHandler, event is - ", event);
-  const eventObj = JSON.parse(event.body);
+  const eventObj = JSON.parse(event);
   console.log("~~~eventObj (event body parsed)", eventObj);
 
   // Check if the table exists
