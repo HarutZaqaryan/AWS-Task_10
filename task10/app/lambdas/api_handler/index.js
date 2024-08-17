@@ -338,6 +338,8 @@ export const createReservationHandler = async (event) => {
 };
 
 const reservationIntersects = async (e) => {
+  console.log("~~~event in resIntersects~~~",e);
+  
   const reserveTableParams = {
     TableName: T_reservations,
   };
