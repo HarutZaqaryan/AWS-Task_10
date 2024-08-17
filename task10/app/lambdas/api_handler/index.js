@@ -359,12 +359,12 @@ export const createReservationHandler = async (event) => {
     const tableData = await dynamoDb.get(tableParams).promise();
     console.log("~~~tableData", tableData);
 
-    if (!tableData.Item) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Table does not exist" }),
-      };
-    }
+    // if (!tableData.Item) {
+    //   return {
+    //     statusCode: 400,
+    //     body: JSON.stringify({ message: "Table does not exist" }),
+    //   };
+    // }
 
     // Check for overlapping reservations
     const reservationParams = {
