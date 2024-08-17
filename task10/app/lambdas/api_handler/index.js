@@ -357,7 +357,7 @@ export const createReservationHandler = async (event) => {
     console.log("~~~tableData", tableData);
 
     for (const item of tableData.Items) {
-      if (tableNumber === item.number) {
+      if (eventObj.tableNumber === item.number) {
         console.log("~~~ITEM~~~",item);
       }
     }
