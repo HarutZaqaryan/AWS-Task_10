@@ -354,7 +354,7 @@ function reservationIntersects(event, data) {
     const r_item = reservData.Items[i];
     console.log("r_item",r_item);
     
-    if (event.tableNumber === r_item.number && event.date == r_item.date) {
+    if (event.tableNumber === r_item.tableNumber && event.date == r_item.date) {
       const resStart = parseTime(r_item.slotTimeStart);
       const resEnd = parseTime(r_item.slotTimeEnd);
       const eventStart = parseTime(event.slotTimeStart);
