@@ -371,8 +371,11 @@ export const createReservationHandler = async (event) => {
 
         function parseTime(time) {
           const [hours, minutes] = time.split(":").map(Number);
+          console.log("~~~hours~~~", hours);
+          console.log("~~~minutes~~~", minutes);
           return new Date(0, 0, 0, hours, minutes);
         }
+        console.log("~~~parsetime 15:00", parseTime("15:00"));
 
         if (
           !(
@@ -401,9 +404,13 @@ export const createReservationHandler = async (event) => {
           };
         } else {
           return {
-            statusCode: 400,
-            body: JSON.stringify({ message: "Reservation already exist" }),
+            statusCode: 200,
+            body: JSON.stringify({ reservationId: params.Item.id }),
           };
+          // return {
+          //   statusCode: 400,
+          //   body: JSON.stringify({ message: "Reservation already exist" }),
+          // };
         }
       }
     }
