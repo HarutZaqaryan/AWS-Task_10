@@ -303,42 +303,6 @@ const getTableByIdHandler = async (event) => {
 //   }
 // };
 
-//! Copilot code
-// const createReservationHandler = async (event) => {
-//   console.log("We in createReservationHandler, event is - ", event);
-//   const eventObj = JSON.parse(event);
-
-//   try {
-//     // Create the reservation
-//     const params = {
-//       TableName: T_reservations,
-//       Item: {
-//         id: uuidv4(),
-//         tableNumber: eventObj.tableNumber,
-//         clientName: eventObj.clientName,
-//         phoneNumber: eventObj.phoneNumber,
-//         date: eventObj.date,
-//         slotTimeStart: eventObj.slotTimeStart,
-//         slotTimeEnd: eventObj.slotTimeEnd,
-//       },
-//     };
-
-//    const data = await dynamoDb.put(params).promise();
-//     return {
-//       statusCode: 200,
-//       body: JSON.stringify({ reservationId: params.Item.id }),
-//     };
-//   }  catch (error) {
-//     console.log("~~~We are in catch block(createReserv)", error.message);
-//     return {
-//       statusCode: 400,
-//       body: JSON.stringify({ message: error.message }),
-//     };
-//   }
-// };
-
-// /reservations GET
-
 // !my code 2
 export const createReservationHandler = async (event) => {
   console.log("We are in createReservationHandler, event is - ", event);
@@ -373,16 +337,20 @@ export const createReservationHandler = async (event) => {
           const [hours, minutes] = time.split(":").map(Number);
           console.log("~~~hours~~~", hours);
           console.log("~~~minutes~~~", minutes);
-          return new Date(0, 0, 0, hours, minutes);
+          // !
+          return new Date(new Date(0, 0, 0, hours, minutes))
+            .toISOString()
+            .substr(11, 5);
         }
         console.log("~~~parsetime 15:00", parseTime("15:00"));
 
-        // if (
-        //   !(
-        //     parseTime(eventObj.slotTimeStart) < parseTime("15:00") &&
-        //     parseTime(eventObj.slotTimeEnd) > parseTime("12:00")
-        //   )
-        // ) {
+        // !
+        if (
+          !(
+            parseTime(eventObj.slotTimeStart) < parseTime("15:00") &&
+            parseTime(eventObj.slotTimeEnd) > parseTime("12:00")
+          )
+        ) {
           console.log("we hereeee");
           const params = {
             TableName: T_reservations,
@@ -402,18 +370,18 @@ export const createReservationHandler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({ reservationId: params.Item.id }),
           };
-        // } 
-        // else {
-        //   return {
-        //     statusCode: 200,
-        //     body: JSON.stringify({ reservationId: params.Item.id }),
-        //   };
-          
+        } else {
+          // !
           // return {
-          //   statusCode: 400,
-          //   body: JSON.stringify({ message: "Reservation already exist" }),
+          //   statusCode: 200,
+          //   body: JSON.stringify({ reservationId: params.Item.id }),
           // };
-        // }
+        // !
+          return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Reservation already exist" }),
+          };
+        }
       }
     }
     if (!tableExists) {
