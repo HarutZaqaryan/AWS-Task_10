@@ -377,12 +377,12 @@ export const createReservationHandler = async (event) => {
         }
         console.log("~~~parsetime 15:00", parseTime("15:00"));
 
-        if (
-          !(
-            parseTime(eventObj.slotTimeStart) < parseTime("15:00") &&
-            parseTime(eventObj.slotTimeEnd) > parseTime("12:00")
-          )
-        ) {
+        // if (
+        //   !(
+        //     parseTime(eventObj.slotTimeStart) < parseTime("15:00") &&
+        //     parseTime(eventObj.slotTimeEnd) > parseTime("12:00")
+        //   )
+        // ) {
           console.log("we hereeee");
           const params = {
             TableName: T_reservations,
@@ -402,16 +402,18 @@ export const createReservationHandler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({ reservationId: params.Item.id }),
           };
-        } else {
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ reservationId: params.Item.id }),
-          };
+        // } 
+        // else {
+        //   return {
+        //     statusCode: 200,
+        //     body: JSON.stringify({ reservationId: params.Item.id }),
+        //   };
+          
           // return {
           //   statusCode: 400,
           //   body: JSON.stringify({ message: "Reservation already exist" }),
           // };
-        }
+        // }
       }
     }
     if (!tableExists) {
