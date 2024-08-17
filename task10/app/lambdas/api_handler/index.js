@@ -406,14 +406,12 @@ export const createReservationHandler = async (event) => {
           };
         }
       }
-
-      if (!tableExists) {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ message: "Table is not exist" }),
-        };
-      }
-      
+    }
+    if (!tableExists) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Table is not exist" }),
+      };
     }
   } catch (error) {
     console.log("~~~We are in createReservations CATCH block");
