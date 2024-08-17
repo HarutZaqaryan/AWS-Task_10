@@ -298,46 +298,46 @@ export const createReservationHandler = async (event) => {
         body: JSON.stringify({ message: "Table is not exist" }),
       };
     } else {
-      //  if (
-      //     eventObj.slotTimeStart < "15:00" &&
-      //     eventObj.slotTimeEnd > "12:00"
-      //   ) {
-      //     return {
-      //       statusCode: 400,
-      //       body: JSON.stringify({ message: "Reservation already exist" }),
-      //     };
-      //   }
-      //    else {
-          const params = {
-            TableName: T_reservations,
-            Item: {
-              id: uuidv4(),
-              tableNumber: eventObj.tableNumber,
-              clientName: eventObj.clientName,
-              phoneNumber: eventObj.phoneNumber,
-              date: eventObj.date,
-              slotTimeStart: eventObj.slotTimeStart,
-              slotTimeEnd: eventObj.slotTimeEnd,
-            },
-          };
-          await dynamoDb.put(params).promise();
+      const reserveTableParams = {
+        TableName: T_reservations,
+      };
+      const reservData = await dynamoDb.scan(reserveTableParams).promise();
+      for (let i = 0; i < reservData.Items.length; i++) {
+        const r_item = reservData.Items[i];
+        if (
+          eventObj.tableNumber === r_item.number &&
+          eventObj.date == r_item.date
+        ) {
+          resStart = r_item.slotTimeStart;
+          resEnd = r_item.slotTimeend;
+          if (eventObj.slotTimeStart <= resEnd && eventObj.slotTimeEnd >= resStart) {
+            return {
+              statusCode: 400,
+              body: JSON.stringify({ message: "Reservation already exists" }),
+            };
+          } else {
+            const params = {
+              TableName: T_reservations,
+              Item: {
+                id: uuidv4(),
+                tableNumber: eventObj.tableNumber,
+                clientName: eventObj.clientName,
+                phoneNumber: eventObj.phoneNumber,
+                date: eventObj.date,
+                slotTimeStart: eventObj.slotTimeStart,
+                slotTimeEnd: eventObj.slotTimeEnd,
+              },
+            };
+            await dynamoDb.put(params).promise();
 
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ reservationId: params.Item.id }),
-          };
-        // }
+            return {
+              statusCode: 200,
+              body: JSON.stringify({ reservationId: params.Item.id }),
+            };
+          }
+        }
+      }
     }
-
-    // ! second loop
-    // const reserveTableParams = {
-    //   TableName: T_reservations,
-    // };
-    // const reservData = await dynamoDb.scan(reserveTableParams).promise();
-    // console.log("~~~reservData~~~", reservData);
-
-    // for (let i = 0; i < reservData.Items.length; i++) {}
-
   } catch (error) {
     console.log("Error in createReservationHandler catch:", error.message);
     return {
