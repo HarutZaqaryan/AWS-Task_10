@@ -350,12 +350,24 @@ function reservationIntersects(event, data) {
   for (let i = 0; i < reservData.Items.length; i++) {
     const r_item = reservData.Items[i];
     if (event.tableNumber === r_item.number && event.date == r_item.date) {
-      resStart = r_item.slotTimeStart;
-      resEnd = r_item.slotTimeend;
-      return event.slotTimeStart <= resEnd && event.slotTimeEnd >= resStart;
+      const resStart = parseTime(r_item.slotTimeStart);
+      const resEnd = parseTime(r_item.slotTimeEnd);
+      const eventStart = parseTime(event.slotTimeStart);
+      const eventEnd = parseTime(event.slotTimeEnd);
+      console.log("resStart",resStart);
+      console.log("resStart",resEnd);
+      console.log("eventStart",eventStart);
+      console.log("eventStart",eventEnd);
+
+      return (eventStart <= resEnd && eventEnd >= resStart);
     }
   }
   return false;
+}
+
+function parseTime(timeStr) {
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  return new Date(0, 0, 0, hours, minutes); 
 }
 
 const getReservationsHandler = async (event) => {
