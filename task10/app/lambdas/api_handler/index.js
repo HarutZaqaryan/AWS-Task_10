@@ -348,79 +348,73 @@ export const createReservationHandler = async (event) => {
   // Check if the table exists
   const tableParams = {
     TableName: T_reservations,
-    Key: {
-      id: eventObj.tableNumber.toString(),
-    },
   };
   console.log("~~~tableParams", tableParams);
 
   try {
     // Validate table existence
-    const tableData = await dynamoDb.get(tableParams).promise();
+    const tableData = await dynamoDb.scan(tableParams).promise();
     console.log("~~~tableData", tableData);
 
-    // if (!tableData.Item) {
-    //   return {
-    //     statusCode: 400,
-    //     body: JSON.stringify({ message: "Table does not exist" }),
-    //   };
-    // }
-
-    // Check for overlapping reservations
-    const reservationParams = {
-      TableName: T_reservations,
-      KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
-      ExpressionAttributeNames: {
-        "#date": "date",
-      },
-      ExpressionAttributeValues: {
-        ":tableNumber": eventObj.tableNumber,
-        ":date": eventObj.date,
-      },
-    };
-    console.log("~~~reservationParams~~~", eventObj);
-
-    const reservationData = await dynamoDb.query(reservationParams).promise();
-    console.log("~~~reservationData~~~", reservationData);
-
-    const reservations = reservationData.Items;
-    console.log("~~~reservation items~~~", reservations);
-
-    for (const reservation of reservations) {
-      if (
-        eventObj.slotTimeStart < reservation.slotTimeEnd &&
-        eventObj.slotTimeEnd > reservation.slotTimeStart
-      ) {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({
-            message: "Reservation time overlaps with an existing reservation",
-          }),
-        };
-      }
+    if (!tableData.Items.length === 0) {
+      const params = {
+        TableName: T_reservations,
+        Item: {
+          id: uuidv4(),
+          tableNumber: eventObj.tableNumber,
+          clientName: eventObj.clientName,
+          phoneNumber: eventObj.phoneNumber,
+          date: eventObj.date,
+          slotTimeStart: eventObj.slotTimeStart,
+          slotTimeEnd: eventObj.slotTimeEnd,
+        },
+      };
+      console.log("~~~paras~~~", params);
+  
+      await dynamoDb.put(params).promise();
+  
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ reservationId: params.Item.id }),
+      };
     }
 
+    // Check for overlapping reservations
+    // const reservationParams = {
+    //   TableName: T_reservations,
+    //   KeyConditionExpression: "tableNumber = :tableNumber AND #date = :date",
+    //   ExpressionAttributeNames: {
+    //     "#date": "date",
+    //   },
+    //   ExpressionAttributeValues: {
+    //     ":tableNumber": eventObj.tableNumber,
+    //     ":date": eventObj.date,
+    //   },
+    // };
+    // console.log("~~~reservationParams~~~", eventObj);
+
+    // const reservationData = await dynamoDb.query(reservationParams).promise();
+    // console.log("~~~reservationData~~~", reservationData);
+
+    // const reservations = reservationData.Items;
+    // console.log("~~~reservation items~~~", reservations);
+
+    // for (const reservation of reservations) {
+    //   if (
+    //     eventObj.slotTimeStart < reservation.slotTimeEnd &&
+    //     eventObj.slotTimeEnd > reservation.slotTimeStart
+    //   ) {
+    //     return {
+    //       statusCode: 400,
+    //       body: JSON.stringify({
+    //         message: "Reservation time overlaps with an existing reservation",
+    //       }),
+    //     };
+    //   }
+    // }
+
     // Create the reservation
-    const params = {
-      TableName: T_reservations,
-      Item: {
-        id: uuidv4(),
-        tableNumber: eventObj.tableNumber,
-        clientName: eventObj.clientName,
-        phoneNumber: eventObj.phoneNumber,
-        date: eventObj.date,
-        slotTimeStart: eventObj.slotTimeStart,
-        slotTimeEnd: eventObj.slotTimeEnd,
-      },
-    };
-    console.log("~~~paras~~~", params);
 
-    await dynamoDb.put(params).promise();
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ reservationId: params.Item.id }),
-    };
   } catch (error) {
     console.log("Error in createReservationHandler:", error.message);
     return {
