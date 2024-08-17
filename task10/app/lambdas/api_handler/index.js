@@ -305,33 +305,36 @@ export const createReservationHandler = async (event) => {
       };
       const reservData = await dynamoDb.scan(reserveTableParams).promise();
 
-      console.log("~~~resIntercests~~~",reservationIntersects(eventObj,reservData));
-      
+      console.log(
+        "~~~resIntercests~~~",
+        reservationIntersects(eventObj, reservData)
+      );
+
       if (reservationIntersects(eventObj, reservData)) {
         return {
           statusCode: 400,
           body: JSON.stringify({ message: "Reservation already exists" }),
         };
+      } else {
+        const params = {
+          TableName: T_reservations,
+          Item: {
+            id: uuidv4(),
+            tableNumber: eventObj.tableNumber,
+            clientName: eventObj.clientName,
+            phoneNumber: eventObj.phoneNumber,
+            date: eventObj.date,
+            slotTimeStart: eventObj.slotTimeStart,
+            slotTimeEnd: eventObj.slotTimeEnd,
+          },
+        };
+        await dynamoDb.put(params).promise();
+
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ reservationId: params.Item.id }),
+        };
       }
-
-      const params = {
-        TableName: T_reservations,
-        Item: {
-          id: uuidv4(),
-          tableNumber: eventObj.tableNumber,
-          clientName: eventObj.clientName,
-          phoneNumber: eventObj.phoneNumber,
-          date: eventObj.date,
-          slotTimeStart: eventObj.slotTimeStart,
-          slotTimeEnd: eventObj.slotTimeEnd,
-        },
-      };
-      await dynamoDb.put(params).promise();
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ reservationId: params.Item.id }),
-      };
     }
   } catch (error) {
     console.log("Error in createReservationHandler catch:", error.message);
@@ -354,20 +357,20 @@ function reservationIntersects(event, data) {
       const resEnd = parseTime(r_item.slotTimeEnd);
       const eventStart = parseTime(event.slotTimeStart);
       const eventEnd = parseTime(event.slotTimeEnd);
-      console.log("resStart",resStart);
-      console.log("resStart",resEnd);
-      console.log("eventStart",eventStart);
-      console.log("eventStart",eventEnd);
+      console.log("resStart", resStart);
+      console.log("resStart", resEnd);
+      console.log("eventStart", eventStart);
+      console.log("eventStart", eventEnd);
 
-      return (eventStart <= resEnd && eventEnd >= resStart);
+      return eventStart <= resEnd && eventEnd >= resStart;
     }
   }
   return false;
 }
 
 function parseTime(timeStr) {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  return new Date(0, 0, 0, hours, minutes); 
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return new Date(0, 0, 0, hours, minutes);
 }
 
 const getReservationsHandler = async (event) => {
