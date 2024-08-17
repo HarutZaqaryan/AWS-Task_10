@@ -356,28 +356,26 @@ export const createReservationHandler = async (event) => {
     const tableData = await dynamoDb.scan(tableParams).promise();
     console.log("~~~tableData", tableData);
 
-    if (!tableData.Items.length === 0) {
-      const params = {
-        TableName: T_reservations,
-        Item: {
-          id: uuidv4(),
-          tableNumber: eventObj.tableNumber,
-          clientName: eventObj.clientName,
-          phoneNumber: eventObj.phoneNumber,
-          date: eventObj.date,
-          slotTimeStart: eventObj.slotTimeStart,
-          slotTimeEnd: eventObj.slotTimeEnd,
-        },
-      };
-      console.log("~~~paras~~~", params);
+      // const params = {
+      //   TableName: T_reservations,
+      //   Item: {
+      //     id: uuidv4(),
+      //     tableNumber: eventObj.tableNumber,
+      //     clientName: eventObj.clientName,
+      //     phoneNumber: eventObj.phoneNumber,
+      //     date: eventObj.date,
+      //     slotTimeStart: eventObj.slotTimeStart,
+      //     slotTimeEnd: eventObj.slotTimeEnd,
+      //   },
+      // };
+      // console.log("~~~paras~~~", params);
   
-      await dynamoDb.put(params).promise();
+      // await dynamoDb.put(params).promise();
   
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ reservationId: params.Item.id }),
-      };
-    }
+      // return {
+      //   statusCode: 200,
+      //   body: JSON.stringify({ reservationId: params.Item.id }),
+      // };
 
     // Check for overlapping reservations
     // const reservationParams = {
