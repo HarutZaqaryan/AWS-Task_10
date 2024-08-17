@@ -291,22 +291,23 @@ export const createReservationHandler = async (event) => {
         tableExists = true;
       }
     }
-    
+
     if (!tableExists) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Table is not exist" }),
       };
     } else {
-       if (
-          eventObj.slotTimeStart < "15:00" &&
-          eventObj.slotTimeEnd > "12:00"
-        ) {
-          return {
-            statusCode: 400,
-            body: JSON.stringify({ message: "Reservation already exist" }),
-          };
-        } else {
+      //  if (
+      //     eventObj.slotTimeStart < "15:00" &&
+      //     eventObj.slotTimeEnd > "12:00"
+      //   ) {
+      //     return {
+      //       statusCode: 400,
+      //       body: JSON.stringify({ message: "Reservation already exist" }),
+      //     };
+      //   }
+      //    else {
           const params = {
             TableName: T_reservations,
             Item: {
@@ -325,7 +326,7 @@ export const createReservationHandler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({ reservationId: params.Item.id }),
           };
-        }
+        // }
     }
 
     // ! second loop
