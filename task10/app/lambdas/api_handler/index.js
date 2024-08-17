@@ -355,6 +355,8 @@ export const createReservationHandler = async (event) => {
 
     for (const item of tableData.Items) {
       if (eventObj.tableNumber === item.number) {
+        console.log("~~~ITEM~~~", item);
+        
 
         const reserveTable = {
           TableName: T_reservations,
@@ -401,12 +403,13 @@ export const createReservationHandler = async (event) => {
         //     body: JSON.stringify({ message: "Reservation already exist" }),
         //   };
         // }
-      } else {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ message: "Table is not exist" }),
-        };
       }
+      //  else {
+      //   return {
+      //     statusCode: 400,
+      //     body: JSON.stringify({ message: "Table is not exist" }),
+      //   };
+      // }
     }
   } catch (error) {
     console.log("Error in createReservationHandler:", error.message);
