@@ -326,6 +326,7 @@ export const createReservationHandler = async (event) => {
       if (eventObj.tableNumber === t_item.number) {
         console.log("~~~t_item~~~", t_item);
         tableExists = true;
+        
         const reserveTableParams = {
           TableName: T_reservations,
         };
@@ -346,29 +347,13 @@ export const createReservationHandler = async (event) => {
 
         // !
         if (
-          !(
             parseTime(eventObj.slotTimeStart) < parseTime("15:00") &&
-            parseTime(eventObj.slotTimeEnd) > parseTime("12:00")
-          )
+            parseTime(eventObj.slotTimeEnd) > parseTime("12:00")    
         ) {
           console.log("we hereeee");
-          const params = {
-            TableName: T_reservations,
-            Item: {
-              id: uuidv4(),
-              tableNumber: eventObj.tableNumber,
-              clientName: eventObj.clientName,
-              phoneNumber: eventObj.phoneNumber,
-              date: eventObj.date,
-              slotTimeStart: eventObj.slotTimeStart,
-              slotTimeEnd: eventObj.slotTimeEnd,
-            },
-          };
-          await dynamoDb.put(params).promise();
-
           return {
-            statusCode: 200,
-            body: JSON.stringify({ reservationId: params.Item.id }),
+            statusCode: 400,
+            body: JSON.stringify({ message: "Reservation already exist" }),
           };
         } else {
           // !
@@ -377,10 +362,24 @@ export const createReservationHandler = async (event) => {
           //   body: JSON.stringify({ reservationId: params.Item.id }),
           // };
         // !
-          return {
-            statusCode: 400,
-            body: JSON.stringify({ message: "Reservation already exist" }),
-          };
+        const params = {
+          TableName: T_reservations,
+          Item: {
+            id: uuidv4(),
+            tableNumber: eventObj.tableNumber,
+            clientName: eventObj.clientName,
+            phoneNumber: eventObj.phoneNumber,
+            date: eventObj.date,
+            slotTimeStart: eventObj.slotTimeStart,
+            slotTimeEnd: eventObj.slotTimeEnd,
+          },
+        };
+        await dynamoDb.put(params).promise();
+
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ reservationId: params.Item.id }),
+        };
         }
       }
     }
